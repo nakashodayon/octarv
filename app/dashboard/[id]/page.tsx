@@ -10,7 +10,7 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, X, Calendar, Tag, FileText, Sparkles, Heart, MessageCircle, Share2, MoreHorizontal, Bookmark } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, FileText, Heart, MessageCircle, Share2, MoreHorizontal, Bookmark } from "lucide-react";
 import BottomMenu from "@/components/bottom-menu";
 
 const TOC_DATA: TOC_INTERFACE[] = [
@@ -235,13 +235,6 @@ export default function FolderDetailPage() {
                           </div>
                         </div>
                       )}
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10">
-                        <Sparkles className="size-5 text-primary" />
-                        <div>
-                          <p className="text-xs text-muted-foreground">AI Tagged</p>
-                          <p className="text-sm font-medium">Auto-categorized</p>
-                        </div>
-                      </div>
                     </div>
 
                     {/* Tags */}
