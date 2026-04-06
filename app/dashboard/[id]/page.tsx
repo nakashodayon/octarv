@@ -83,16 +83,16 @@ export default function FolderDetailPage() {
       <MotionConfig transition={{ duration: 0.8 }}>
         {/* Header */}
         <div className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center px-6 py-4">
             <button
-              onClick={() => router.back()}
+              onClick={() => router.push("/dashboard")}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="size-5" />
-              <span className="font-medium">Back</span>
+              <span className="font-medium">Home</span>
             </button>
-            <h1 className="text-lg font-semibold">{folderTitle}</h1>
-            <div className="w-20" />
+            <span className="mx-2 text-muted-foreground">/</span>
+            <span className="font-semibold">{folderTitle}</span>
           </div>
         </div>
 
