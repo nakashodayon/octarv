@@ -110,7 +110,7 @@ export default function FolderDetailPage() {
 
         {/* Pinterest Grid */}
         <div 
-          className="pt-6 pb-32 px-6 h-screen overflow-y-auto" 
+          className="pt-20 pb-32 px-6 h-screen overflow-y-auto" 
           ref={ref}
         >
           <AnimatePresence mode="popLayout">
