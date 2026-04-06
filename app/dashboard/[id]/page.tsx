@@ -155,32 +155,29 @@ export default function FolderDetailPage() {
                 className="h-full overflow-hidden border-r border-border bg-background z-30 flex-shrink-0"
               >
                 <div className="h-full overflow-y-auto overflow-x-hidden">
-                  {/* Detail Header */}
-                  <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border px-6 py-4">
-                    <div className="flex items-center">
+                  {/* Detail Content */}
+                  <div className="p-6">
+                    {/* Image with overlaid back button */}
+                    <div className="relative mb-6">
+                      <motion.div
+                        layoutId={`item-${active.value}-${selectedIndex}`}
+                        className="rounded-2xl overflow-hidden"
+                      >
+                        <img
+                          src={selectedItem.url}
+                          className="w-full object-cover rounded-2xl"
+                          style={{ maxHeight: "60vh" }}
+                          alt={selectedItem.title || "Detail view"}
+                        />
+                      </motion.div>
+                      {/* Back button overlay */}
                       <button
                         onClick={handleClose}
-                        className="p-2 rounded-full hover:bg-muted transition-colors"
+                        className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-xl hover:bg-background transition-colors"
                       >
                         <ArrowLeft className="size-5" />
                       </button>
                     </div>
-                  </div>
-
-                  {/* Detail Content */}
-                  <div className="p-6">
-                    {/* Image */}
-                    <motion.div
-                      layoutId={`item-${active.value}-${selectedIndex}`}
-                      className="rounded-2xl overflow-hidden mb-6"
-                    >
-                      <img
-                        src={selectedItem.url}
-                        className="w-full object-cover rounded-2xl"
-                        style={{ maxHeight: "60vh" }}
-                        alt={selectedItem.title || "Detail view"}
-                      />
-                    </motion.div>
 
                     {/* Title & Description */}
                     <h2 className="text-2xl font-bold mb-3">
