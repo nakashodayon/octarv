@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Tag, FileText, Heart, MessageCircle, Share2, MoreHorizontal, Bookmark } from "lucide-react";
 import BottomMenu from "@/components/bottom-menu";
+import { AnimatedTags, TagItem } from "@/components/ui/animated-tags";
 
 const TOC_DATA: TOC_INTERFACE[] = [
   { name: "All" },
@@ -244,16 +245,13 @@ export default function FolderDetailPage() {
                           <Tag className="size-4 text-muted-foreground" />
                           <p className="text-sm font-medium text-muted-foreground">Tags</p>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedItem.tags.map((tag, i) => (
-                            <span
-                              key={i}
-                              className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full hover:bg-muted/80 cursor-pointer transition-colors"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                        <AnimatedTags
+                          tags={selectedItem.tags.map((tag, i) => ({
+                            id: `${tag}-${i}`,
+                            label: tag,
+                          }))}
+                          editable={false}
+                        />
                       </div>
                     )}
 
