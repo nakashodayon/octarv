@@ -82,7 +82,7 @@ export default function FolderDetailPage() {
     <div className="min-h-screen bg-background">
       <MotionConfig transition={{ duration: 0.8 }}>
         {/* Header */}
-        <div className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl">
+        <div className="fixed top-0 left-0 right-0 z-40">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center">
               <button
@@ -95,19 +95,22 @@ export default function FolderDetailPage() {
               <span className="mx-2 text-muted-foreground">/</span>
               <span className="font-semibold">{folderTitle}</span>
             </div>
-            <DynamicScrollIslandTOC
-              data={TOC_DATA}
-              value={active}
-              setValue={setActive}
-              ref={ref}
-              lPrefix={folderId}
-            />
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <DynamicScrollIslandTOC
+                data={TOC_DATA}
+                value={active}
+                setValue={setActive}
+                ref={ref}
+                lPrefix={folderId}
+              />
+            </div>
+            <div className="w-32" />
           </div>
         </div>
 
         {/* Pinterest Grid */}
         <div 
-          className="pt-24 pb-32 px-6 h-screen overflow-y-auto" 
+          className="pt-6 pb-32 px-6 h-screen overflow-y-auto" 
           ref={ref}
         >
           <AnimatePresence mode="popLayout">
