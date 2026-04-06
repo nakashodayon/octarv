@@ -116,16 +116,16 @@ export default function FolderDetailPage() {
               className="fixed top-0 left-0 right-0 z-40"
             >
               <div className="flex items-center justify-between px-6 py-4">
-                <div className="flex items-center gap-2 bg-background/80 backdrop-blur-xl border border-border rounded-full px-4 py-2 shadow-sm">
+                <div className="flex items-center gap-2 bg-black rounded-full px-4 py-2 shadow-sm">
                   <button
                     onClick={() => router.push("/dashboard")}
-                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
                   >
                     <ArrowLeft className="size-4" />
                     <span className="text-sm font-bold">Home</span>
                   </button>
-                  <span className="text-muted-foreground">/</span>
-                  <span className="text-sm font-bold">{folderTitle}</span>
+                  <span className="text-white/40">/</span>
+                  <span className="text-sm font-bold text-white">{folderTitle}</span>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2">
                   <DynamicScrollIslandTOC
