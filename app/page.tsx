@@ -1,5 +1,5 @@
-import { Demo } from "@/components/demo"
+import HeroSection from "@/components/ui/hero-section-note"
 
 export default function Page() {
-  return <Demo />
+  return <HeroSection />
 }
