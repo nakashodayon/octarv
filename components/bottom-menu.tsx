@@ -259,7 +259,7 @@ const BottomMenu = () => {
         </motion.div>
 
         {/* Opened state - Expanded menu */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full">
           <AnimatePresence mode="popLayout" initial={false}>
             {open && (
               <motion.div
@@ -272,6 +272,24 @@ const BottomMenu = () => {
                 )}
                 style={{ borderRadius: 24 }}
               >
+                {/* Content area - above toolbar */}
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {content && (
+                    <motion.div
+                      key={view}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden border-b border-white/10"
+                    >
+                      <div className="py-1">
+                        {content}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                
                 <motion.div layoutId={iKey} layout="position" className="flex items-center gap-1 p-1">
                   {MAIN_NAV.map(({ icon: Icon, name }) => (
                     <button
@@ -291,24 +309,6 @@ const BottomMenu = () => {
                     </button>
                   ))}
                 </motion.div>
-                
-                {/* Content area */}
-                <AnimatePresence mode="popLayout" initial={false}>
-                  {content && (
-                    <motion.div
-                      key={view}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden border-t border-white/10"
-                    >
-                      <div className="py-1">
-                        {content}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
