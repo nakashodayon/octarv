@@ -7,15 +7,22 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { signup } from './actions'
 
 export default function SignupPage() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle signup logic here
+  const handleSubmit = async (formData: FormData) => {
+    setIsLoading(true)
+    setError(null)
+    
+    const result = await signup(formData)
+    
+    if (result?.error) {
+      setError(result.error)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -29,14 +36,19 @@ export default function SignupPage() {
           <p className="text-muted-foreground mt-2 text-sm">Get started with your free account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+              {error}
+            </div>
+          )}
+
           <Field>
             <FieldLabel>Name</FieldLabel>
             <Input
               type="text"
+              name="name"
               placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               required
             />
           </Field>
@@ -45,9 +57,8 @@ export default function SignupPage() {
             <FieldLabel>Email</FieldLabel>
             <Input
               type="email"
+              name="email"
               placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </Field>
@@ -56,15 +67,15 @@ export default function SignupPage() {
             <FieldLabel>Password</FieldLabel>
             <Input
               type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              placeholder="Create a password (min 8 characters)"
               required
+              minLength={8}
             />
           </Field>
 
-          <Button type="submit" className="w-full">
-            Sign up
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Creating account..." : "Sign up"}
           </Button>
         </form>
 

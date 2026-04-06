@@ -7,14 +7,22 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { login } from './actions'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
+  const handleSubmit = async (formData: FormData) => {
+    setIsLoading(true)
+    setError(null)
+    
+    const result = await login(formData)
+    
+    if (result?.error) {
+      setError(result.error)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -28,14 +36,19 @@ export default function LoginPage() {
           <p className="text-muted-foreground mt-2 text-sm">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+              {error}
+            </div>
+          )}
+
           <Field>
             <FieldLabel>Email</FieldLabel>
             <Input
               type="email"
+              name="email"
               placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </Field>
@@ -44,15 +57,14 @@ export default function LoginPage() {
             <FieldLabel>Password</FieldLabel>
             <Input
               type="password"
+              name="password"
               placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </Field>
 
-          <Button type="submit" className="w-full">
-            Sign in
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
 
