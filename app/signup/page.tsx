@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signup } from './actions'
 import { toast } from 'sonner'
@@ -78,6 +78,7 @@ export default function SignupPage() {
           </Field>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Loader2 className="size-4 animate-spin" />}
             {isLoading ? "Creating account..." : "Sign up"}
           </Button>
         </form>
