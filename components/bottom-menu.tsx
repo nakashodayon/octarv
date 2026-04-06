@@ -19,6 +19,7 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import useMeasure from "react-use-measure";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 const MAIN_NAV = [
   { icon: PlusSignIcon, name: "home" },
@@ -57,7 +58,7 @@ const BottomMenu = () => {
     "default" | "home" | "search" | "notifications" | "profile" | "theme"
   >("default");
 
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
+  const { theme, setTheme } = useTheme();
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -168,7 +169,7 @@ const BottomMenu = () => {
             {THEME_OPTIONS.map(({ key, icon: Icon, text }) => (
               <button
                 key={key}
-                onClick={() => setTheme(key as "light" | "dark" | "system")}
+                onClick={() => setTheme(key)}
                 className={`flex items-center justify-center gap-2 rounded-[12px] px-3 py-2 transition-all duration-100 ${
                   theme === key
                     ? "bg-accent text-foreground"
