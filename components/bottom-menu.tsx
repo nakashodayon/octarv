@@ -15,7 +15,7 @@ import {
   AutoConversationsIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -53,7 +53,6 @@ const cKey = "bottom-menu-wrapper";
 const iKey = "bottom-menu-items";
 
 const BottomMenu = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<
     "default" | "home" | "search" | "notifications" | "profile" | "theme"
@@ -143,7 +142,7 @@ const BottomMenu = () => {
 
       case "notifications":
         return (
-          <div className="space-y-0.5 min-w-[210px] p-[6px] py-0.5">
+          <div className="space-y-0.5 min-w-[210px] p-[8px] py-0.5">
             {NOTIFICATION_TYPES.map((t) => (
               <button key={t} className={sharedHover}>
                 <span className="transition-all duration-75">{t}</span>
@@ -154,7 +153,7 @@ const BottomMenu = () => {
 
       case "profile":
         return (
-          <div className="space-y-0.5 min-w-[230px] p-[6px] py-0.5">
+          <div className="space-y-0.5 min-w-[230px] p-[8px] py-0.5">
             {PROFILE_LINKS.map((t) => (
               <button key={t} className={sharedHover}>
                 <span className="transition-all duration-75">{t}</span>
@@ -169,7 +168,7 @@ const BottomMenu = () => {
 
       case "theme":
         return (
-          <div className="flex items-center justify-between gap-1.5 min-w-[270px] p-[6px] py-0.5">
+          <div className="flex items-center justify-between gap-1.5 min-w-[270px] p-[8px] py-0.5">
             {THEME_OPTIONS.map(({ key, icon: Icon, text }) => (
               <button
                 key={key}
@@ -200,6 +199,28 @@ const BottomMenu = () => {
 
   const transition = { type: "spring", duration: 0.5, bounce: 0.1 };
 
+  const NavButtons = ({ isOpen }: { isOpen: boolean }) => (
+    <motion.div layoutId={iKey} layout="position" className="flex items-center gap-1 p-1">
+      {MAIN_NAV.map(({ icon: Icon, name }) => (
+        <button
+          key={name}
+          className={`p-3 rounded-full transition-all ${
+            view === name && isOpen ? "bg-white/10" : "hover:bg-white/10"
+          }`}
+          onClick={() => handleNavClick(name)}
+        >
+          <HugeiconsIcon
+            icon={Icon}
+            size={22}
+            className={`transition-all ${
+              view === name && isOpen ? "text-white" : "text-white/60"
+            }`}
+          />
+        </button>
+      ))}
+    </motion.div>
+  );
+
   return (
     <MotionConfig transition={transition}>
       {/* Backdrop */}
@@ -220,99 +241,41 @@ const BottomMenu = () => {
         )}
       </AnimatePresence>
 
-      <div
-        ref={containerRef}
-        className={cn(
-          "relative z-50 cursor-pointer select-none flex flex-col items-center"
-        )}
-      >
-        {/* Closed state - Toolbar */}
-        <motion.div
-          role="button"
-          aria-label="Menu"
-          layoutId={cKey}
-          style={{ borderRadius: 24 }}
-          className={cn(
-            "relative flex items-center gap-1 overflow-hidden p-1",
-            "bg-black"
-          )}
-        >
-          <motion.div layoutId={iKey} layout="position" className="flex items-center gap-1">
-            {MAIN_NAV.map(({ icon: Icon, name }) => (
-              <button
-                key={name}
-                className={`p-3 rounded-full transition-all ${
-                  view === name && open ? "bg-white/10" : "hover:bg-white/10"
-                }`}
-                onClick={() => handleNavClick(name)}
-              >
-                <HugeiconsIcon
-                  icon={Icon}
-                  size={22}
-                  className={`transition-all ${
-                    view === name && open ? "text-white" : "text-white/60"
-                  }`}
-                />
-              </button>
-            ))}
+      <div className="relative z-50 cursor-pointer select-none">
+        {!open ? (
+          /* Closed state */
+          <motion.div
+            layoutId={cKey}
+            style={{ borderRadius: 24 }}
+            className="bg-black overflow-hidden"
+          >
+            <NavButtons isOpen={false} />
           </motion.div>
-        </motion.div>
-
-        {/* Opened state - Expanded menu */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full">
-          <AnimatePresence mode="popLayout" initial={false}>
-            {open && (
-              <motion.div
-                role="button"
-                aria-label="Close"
-                layoutId={cKey}
-                className={cn(
-                  "cursor-pointer overflow-hidden",
-                  "bg-black"
-                )}
-                style={{ borderRadius: 24 }}
-              >
-                {/* Content area - above toolbar */}
-                <AnimatePresence mode="popLayout" initial={false}>
-                  {content && (
-                    <motion.div
-                      key={view}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden border-b border-white/10"
-                    >
-                      <div className="py-1">
-                        {content}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                <motion.div layoutId={iKey} layout="position" className="flex items-center gap-1 p-1">
-                  {MAIN_NAV.map(({ icon: Icon, name }) => (
-                    <button
-                      key={name}
-                      className={`p-3 rounded-full transition-all ${
-                        view === name ? "bg-white/10" : "hover:bg-white/10"
-                      }`}
-                      onClick={() => handleNavClick(name)}
-                    >
-                      <HugeiconsIcon
-                        icon={Icon}
-                        size={22}
-                        className={`transition-all ${
-                          view === name ? "text-white" : "text-white/60"
-                        }`}
-                      />
-                    </button>
-                  ))}
+        ) : (
+          /* Open state */
+          <motion.div
+            layoutId={cKey}
+            style={{ borderRadius: 24 }}
+            className="bg-black overflow-hidden"
+          >
+            {/* Content area - above toolbar */}
+            <AnimatePresence mode="popLayout" initial={false}>
+              {content && (
+                <motion.div
+                  key={view}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden border-b border-white/10"
+                >
+                  {content}
                 </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              )}
+            </AnimatePresence>
+            <NavButtons isOpen={true} />
+          </motion.div>
+        )}
       </div>
     </MotionConfig>
   );
