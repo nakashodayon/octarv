@@ -17,7 +17,7 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
     <div className="flex flex-col items-center gap-2">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-28 h-20 relative cursor-pointer"
+        className="w-40 h-28 relative cursor-pointer"
       >
         <div
           className="folder relative w-[87.5%] mx-auto items-center h-full flex justify-center"
@@ -70,7 +70,7 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
               initial={page.initial}
               animate={isOpen ? page.open : page.initial}
               transition={page.transition}
-              className={`absolute top-1 w-10 h-fit rounded-md ${page.className}`}
+              className={`absolute top-2 w-14 h-fit rounded-md ${page.className}`}
             >
               <Page />
             </motion.div>
@@ -80,7 +80,7 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
         <motion.div
           animate={{ rotateX: isOpen ? -40 : 0 }}
           transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-          className="absolute -left-[1px] -right-[1px] -bottom-[1px] z-20 h-16 rounded-xl origin-bottom flex justify-center items-center overflow-visible"
+          className="absolute -left-[1px] -right-[1px] -bottom-[1px] z-20 h-24 rounded-xl origin-bottom flex justify-center items-center overflow-visible"
         >
           <svg
             className="w-full h-full overflow-visible"
@@ -149,13 +149,13 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
 export default FolderInteraction;
 
 const Page = () => (
-  <div className="w-full h-full bg-gradient-to-b from-[#E8E7F0] to-[#DCDAE8] rounded-md shadow-lg p-1.5">
-    <div className="flex flex-col gap-0.5">
-      <div className="w-full h-0.5 bg-[#CFCDE0] rounded-full" />
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex gap-0.5">
-          <div className="flex-1 h-0.5 bg-[#CFCDE0] rounded-full" />
-          <div className="flex-1 h-0.5 bg-[#CFCDE0] rounded-full" />
+  <div className="w-full h-full bg-gradient-to-b from-[#E8E7F0] to-[#DCDAE8] rounded-md shadow-lg p-2">
+    <div className="flex flex-col gap-1">
+      <div className="w-full h-1 bg-[#CFCDE0] rounded-full" />
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex gap-1">
+          <div className="flex-1 h-1 bg-[#CFCDE0] rounded-full" />
+          <div className="flex-1 h-1 bg-[#CFCDE0] rounded-full" />
         </div>
       ))}
     </div>

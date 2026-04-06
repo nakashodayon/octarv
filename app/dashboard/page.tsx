@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     <div className="min-h-screen flex flex-col">
       {/* Folders - same width as bottom menu */}
       <div className="fixed top-6 left-0 right-0 flex justify-center">
-        <div className="flex items-center gap-4 bg-background/95 backdrop-blur-xl border border-border rounded-[18px] p-4">
+        <div className="flex items-center gap-6">
           {folders.map((folder) => (
             <FolderInteraction key={folder.title} title={folder.title} />
           ))}
