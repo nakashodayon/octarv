@@ -8,6 +8,7 @@ import { Field, FieldLabel } from '@/components/ui/field'
 import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { login } from './actions'
+import { toast } from 'sonner'
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
@@ -22,6 +23,8 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error)
       setIsLoading(false)
+    } else {
+      toast.success("Signed in successfully!")
     }
   }
 

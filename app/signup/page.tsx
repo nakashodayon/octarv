@@ -8,6 +8,7 @@ import { Field, FieldLabel } from '@/components/ui/field'
 import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signup } from './actions'
+import { toast } from 'sonner'
 
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
@@ -22,6 +23,8 @@ export default function SignupPage() {
     if (result?.error) {
       setError(result.error)
       setIsLoading(false)
+    } else {
+      toast.success("Account created successfully!")
     }
   }
 
