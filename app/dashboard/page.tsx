@@ -1,15 +1,7 @@
-import { redirect } from "next/navigation"
-import { getSession } from "@/lib/auth"
 import BottomMenu from "@/components/bottom-menu"
 import FolderInteraction from "@/components/folder-interaction"
 
-export default async function DashboardPage() {
-  const session = await getSession()
-
-  if (!session) {
-    redirect("/login")
-  }
-
+export default function DashboardPage() {
   const folders = [
     { title: "Work" },
     { title: "Personal" },
