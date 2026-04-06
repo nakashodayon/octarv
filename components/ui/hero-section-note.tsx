@@ -7,11 +7,11 @@ import { cn } from '@/lib/utils'
 
 export default function HeroSection() {
     return (
-        <section className="py-20">
+        <section className="min-h-screen flex flex-col justify-center py-12 overflow-hidden">
             <div className="relative z-10 mx-auto w-full max-w-2xl px-6 lg:px-0">
                 <div className="relative text-center">
                     <MistKitLogo className="mx-auto" />
-                    <h1 className="mx-auto mt-16 max-w-xl text-balance text-5xl font-medium">The Note App</h1>
+                    <h1 className="mx-auto mt-8 max-w-xl text-balance text-5xl font-medium">The Note App</h1>
 
                     <p className="text-muted-foreground mx-auto mb-6 mt-4 text-balance text-xl">The Note App is a simple note app that allows you to create and manage your notes.</p>
 
@@ -33,7 +33,7 @@ export default function HeroSection() {
                     </div>
                 </div>
 
-                <div className="relative mt-12 overflow-hidden rounded-3xl bg-black/10 md:mt-16">
+                <div className="relative mt-8 overflow-hidden rounded-3xl bg-black/10 md:mt-10">
                     <img
                         src="https://images.unsplash.com/photo-1547623641-d2c56c03e2a7?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                         alt=""
@@ -51,7 +51,7 @@ export default function HeroSection() {
                     </div>
                 </div>
 
-                <div className="mt-8 flex flex-wrap items-center gap-4">
+                <div className="mt-6 flex flex-wrap items-center gap-4">
                     <p className="text-muted-foreground text-center">Trusted by teams at :</p>
                     <div className="flex flex-wrap items-center justify-center gap-8">
                         <div className="flex">
