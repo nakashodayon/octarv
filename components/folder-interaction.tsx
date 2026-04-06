@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 
 interface FolderInteractionProps {
   title?: string;
@@ -11,8 +10,6 @@ interface FolderInteractionProps {
 function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   const pageVariants = {
     spring: { type: "spring" as const, duration: 0.6 },
@@ -32,10 +29,8 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
         <div
           className="folder relative w-[87.5%] mx-auto items-center h-full flex justify-center"
           style={{
-            background: isDark ? "#18151B" : "#E8E4ED",
-            boxShadow: isDark 
-              ? "0px 0px 8px 8px rgba(79, 73, 85, 0.30) inset"
-              : "0px 0px 8px 8px rgba(180, 170, 195, 0.30) inset",
+            background: "#18151B",
+            boxShadow: "0px 0px 8px 8px rgba(79, 73, 85, 0.30) inset",
             borderRadius: 8,
           }}
         >
@@ -134,8 +129,8 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
                 y2="121.7"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor={isDark ? "#2D2535" : "#C8C0D3"} />
-                <stop offset="1" stopColor={isDark ? "#2A2A2A" : "#B8B0C5"} />
+                <stop stopColor="#2D2535" />
+                <stop offset="1" stopColor="#2A2A2A" />
               </linearGradient>
               <linearGradient
                 id="paint1_linear_folder"
@@ -145,8 +140,8 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
                 y2="121.7"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor={isDark ? "#424242" : "#A0A0A0"} stopOpacity="0.04" />
-                <stop offset="1" stopColor={isDark ? "#212121" : "#909090"} stopOpacity="0.3" />
+                <stop stopColor="#424242" stopOpacity="0.04" />
+                <stop offset="1" stopColor="#212121" stopOpacity="0.3" />
               </linearGradient>
             </defs>
           </svg>
