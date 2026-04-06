@@ -158,22 +158,23 @@ export default function FolderDetailPage() {
                   {/* Detail Content */}
                   <div className="p-6">
                     {/* Image with overlaid back button */}
-                    <div className="relative mb-6">
+                    <div className="relative mb-6 flex justify-center">
                       <motion.div
                         layoutId={`item-${active.value}-${selectedIndex}`}
+                        layout="preserve-aspect"
                         className="rounded-2xl overflow-hidden"
-                        style={{ height: selectedItem.height }}
                       >
                         <img
                           src={selectedItem.url}
-                          className="w-full h-full object-cover rounded-2xl"
+                          className="object-cover rounded-2xl"
+                          style={{ height: selectedItem.height, width: "auto" }}
                           alt={selectedItem.title || "Detail view"}
                         />
                       </motion.div>
                       {/* Back button overlay */}
                       <button
                         onClick={handleClose}
-                        className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-xl hover:bg-background transition-colors"
+                        className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-xl hover:bg-background transition-colors z-10"
                       >
                         <ArrowLeft className="size-5" />
                       </button>
