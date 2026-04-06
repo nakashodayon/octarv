@@ -83,33 +83,31 @@ export default function FolderDetailPage() {
       <MotionConfig transition={{ duration: 0.8 }}>
         {/* Header */}
         <div className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl">
-          <div className="flex items-center px-6 py-4">
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="size-5" />
-              <span className="font-medium">Home</span>
-            </button>
-            <span className="mx-2 text-muted-foreground">/</span>
-            <span className="font-semibold">{folderTitle}</span>
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="size-5" />
+                <span className="font-medium">Home</span>
+              </button>
+              <span className="mx-2 text-muted-foreground">/</span>
+              <span className="font-semibold">{folderTitle}</span>
+            </div>
+            <DynamicScrollIslandTOC
+              data={TOC_DATA}
+              value={active}
+              setValue={setActive}
+              ref={ref}
+              lPrefix={folderId}
+            />
           </div>
-        </div>
-
-        {/* TOC Menu */}
-        <div className="fixed top-20 left-0 right-0 z-30 flex justify-center">
-          <DynamicScrollIslandTOC
-            data={TOC_DATA}
-            value={active}
-            setValue={setActive}
-            ref={ref}
-            lPrefix={folderId}
-          />
         </div>
 
         {/* Pinterest Grid */}
         <div 
-          className="pt-40 pb-32 px-6 h-screen overflow-y-auto" 
+          className="pt-24 pb-32 px-6 h-screen overflow-y-auto" 
           ref={ref}
         >
           <AnimatePresence mode="popLayout">
