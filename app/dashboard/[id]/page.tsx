@@ -158,16 +158,14 @@ export default function FolderDetailPage() {
                   {/* Detail Content */}
                   <div className="p-6">
                     {/* Image with overlaid back button */}
-                    <div className="relative mb-6 flex justify-center">
+                    <div className="relative mb-6">
                       <motion.div
                         layoutId={`item-${active.value}-${selectedIndex}`}
-                        layout="preserve-aspect"
-                        className="rounded-2xl overflow-hidden"
+                        className="rounded-2xl overflow-hidden w-full"
                       >
                         <img
                           src={selectedItem.url}
-                          className="object-cover rounded-2xl"
-                          style={{ height: selectedItem.height, width: "auto" }}
+                          className="w-full object-cover rounded-2xl"
                           alt={selectedItem.title || "Detail view"}
                         />
                       </motion.div>
