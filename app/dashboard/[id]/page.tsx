@@ -124,7 +124,7 @@ export default function FolderDetailPage() {
                     <ArrowLeft className="size-4" />
                     <span className="text-sm font-bold">Home</span>
                   </button>
-                  <span className="text-white/40">/</span>
+                  <span className="text-white/60">/</span>
                   <span className="text-sm font-bold text-white">{folderTitle}</span>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2">
