@@ -182,19 +182,6 @@ export default function FolderDetailPage() {
                       />
                     </motion.div>
 
-                    {/* Author Info */}
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                        <span className="text-sm font-bold">
-                          {selectedItem.author?.charAt(0) || "U"}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">{selectedItem.author || "Unknown"}</p>
-                        <p className="text-xs text-muted-foreground">Creator</p>
-                      </div>
-                    </div>
-
                     {/* Title & Description */}
                     <h2 className="text-2xl font-bold mb-3">
                       {selectedItem.title || `Item ${selectedIndex + 1}`}
