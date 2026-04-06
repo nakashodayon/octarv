@@ -90,10 +90,10 @@ export default function FolderDetailPage() {
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="size-4" />
-                <span className="text-sm font-medium">Home</span>
+                <span className="text-sm font-bold">Home</span>
               </button>
               <span className="text-muted-foreground">/</span>
-              <span className="text-sm font-semibold">{folderTitle}</span>
+              <span className="text-sm font-bold">{folderTitle}</span>
             </div>
             <div className="absolute left-1/2 -translate-x-1/2">
               <DynamicScrollIslandTOC
