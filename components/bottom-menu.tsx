@@ -89,7 +89,7 @@ const BottomMenu = () => {
     switch (view) {
       case "home":
         return (
-          <div className="space-y-0.5 min-w-[210px] p-[6px] py-0.5">
+          <div className="space-y-0.5 p-[6px] py-0.5">
             {HOME_ITEMS.map(({ icon: Icon, text }) => (
               <button
                 key={text}
@@ -108,7 +108,7 @@ const BottomMenu = () => {
 
       case "search":
         return (
-          <div className="space-y-2 min-w-[270px] p-[8px] py-1">
+          <div className="space-y-2 p-[8px] py-1">
             <div className="relative">
               <HugeiconsIcon
                 icon={Search01Icon}
@@ -142,7 +142,7 @@ const BottomMenu = () => {
 
       case "notifications":
         return (
-          <div className="space-y-0.5 min-w-[210px] p-[8px] py-0.5">
+          <div className="space-y-0.5 p-[8px] py-0.5">
             {NOTIFICATION_TYPES.map((t) => (
               <button key={t} className={sharedHover}>
                 <span className="transition-all duration-75">{t}</span>
@@ -153,7 +153,7 @@ const BottomMenu = () => {
 
       case "profile":
         return (
-          <div className="space-y-0.5 min-w-[230px] p-[8px] py-0.5">
+          <div className="space-y-0.5 p-[8px] py-0.5">
             {PROFILE_LINKS.map((t) => (
               <button key={t} className={sharedHover}>
                 <span className="transition-all duration-75">{t}</span>
@@ -168,7 +168,7 @@ const BottomMenu = () => {
 
       case "theme":
         return (
-          <div className="flex items-center justify-between gap-1.5 min-w-[270px] p-[8px] py-0.5">
+          <div className="flex items-center justify-between gap-1.5 p-[8px] py-0.5">
             {THEME_OPTIONS.map(({ key, icon: Icon, text }) => (
               <button
                 key={key}
