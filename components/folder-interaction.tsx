@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface FolderInteractionProps {
   title?: string;
@@ -8,6 +9,7 @@ interface FolderInteractionProps {
 
 function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   const pageVariants = {
     spring: { type: "spring" as const, duration: 0.6 },
@@ -16,7 +18,12 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
   return (
     <div className="flex flex-col items-center gap-2">
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(true);
+          setTimeout(() => {
+            router.push(`/dashboard/${title.toLowerCase()}`);
+          }, 300);
+        }}
         className="w-40 h-28 relative cursor-pointer"
       >
         <div
