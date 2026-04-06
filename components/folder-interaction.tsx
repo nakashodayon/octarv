@@ -155,13 +155,13 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
 export default FolderInteraction;
 
 const Page = () => (
-  <div className="w-full bg-gradient-to-b from-[#E8E7F0] to-[#DCDAE8] rounded-md shadow-lg p-1.5 py-2">
+  <div className="w-full bg-gradient-to-b from-[#E8E7F0] to-[#DCDAE8] rounded-md shadow-lg p-2 py-2.5">
     <div className="flex flex-col gap-1">
-      <div className="w-full h-0.5 bg-[#CFCDE0] rounded-full" />
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="flex gap-0.5">
-          <div className="flex-1 h-0.5 bg-[#CFCDE0] rounded-full" />
-          <div className="flex-1 h-0.5 bg-[#CFCDE0] rounded-full" />
+      <div className="w-full h-1 bg-[#CFCDE0] rounded-full" />
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex gap-1">
+          <div className="flex-1 h-1 bg-[#CFCDE0] rounded-full" />
+          <div className="flex-1 h-1 bg-[#CFCDE0] rounded-full" />
         </div>
       ))}
     </div>
