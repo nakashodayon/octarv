@@ -77,7 +77,7 @@ const BottomMenu = () => {
   }, []);
 
   const sharedHover =
-    "group transition-all duration-75 px-3 py-2 text-[15px] text-muted-foreground w-full text-left rounded-[12px] hover:bg-muted/80 hover:text-foreground";
+    "group transition-all duration-75 px-3 py-2 text-[15px] text-white/60 w-full text-left rounded-full hover:bg-white/10 hover:text-white";
 
   const content = useMemo(() => {
     switch (view) {
@@ -95,7 +95,7 @@ const BottomMenu = () => {
                 <HugeiconsIcon
                   icon={Icon}
                   size={20}
-                  className="text-muted-foreground group-hover:text-foreground transition-all duration-75"
+                  className="text-white/60 group-hover:text-white transition-all duration-75"
                 />
                 <span className="transition-all duration-75">{text}</span>
               </button>
@@ -110,25 +110,25 @@ const BottomMenu = () => {
               <HugeiconsIcon
                 icon={Search01Icon}
                 size={17}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
               />
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full pl-9 pr-3 py-[6px] text-[14.5px] text-foreground bg-muted/80 border border-border rounded-[12px] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground/50"
+                className="w-full pl-9 pr-3 py-[6px] text-[14.5px] text-white bg-white/10 border border-white/10 rounded-full focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-white/40"
               />
             </div>
             <div className="flex gap-1.5">
               {SEARCH_OPTIONS.map(({ icon: Icon, text }) => (
                 <button
                   key={text}
-                  className={`${sharedHover} flex-1 flex items-center justify-center gap-1.5 bg-muted hover:bg-accent`}
+                  className={`${sharedHover} flex-1 flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/15`}
                 >
                   <HugeiconsIcon
                     icon={Icon}
                     size={14}
                     strokeWidth={2}
-                    className="text-muted-foreground group-hover:text-foreground transition-all duration-75"
+                    className="text-white/60 group-hover:text-white transition-all duration-75"
                   />
                   <span className="transition-all duration-75">{text}</span>
                 </button>
@@ -156,8 +156,8 @@ const BottomMenu = () => {
                 <span className="transition-all duration-75">{t}</span>
               </button>
             ))}
-            <div className="border-t border-border my-[2px]" />
-            <button className="px-3 py-2 text-[15px] text-destructive w-full text-left rounded-[12px] hover:bg-destructive/10 transition-all duration-75">
+            <div className="border-t border-white/10 my-[2px]" />
+            <button className="px-3 py-2 text-[15px] text-red-400 w-full text-left rounded-full hover:bg-red-500/10 transition-all duration-75">
               Logout
             </button>
           </div>
@@ -170,17 +170,17 @@ const BottomMenu = () => {
               <button
                 key={key}
                 onClick={() => setTheme(key)}
-                className={`flex items-center justify-center gap-2 rounded-[12px] px-3 py-2 transition-all duration-100 ${
+                className={`flex items-center justify-center gap-2 rounded-full px-3 py-2 transition-all duration-100 ${
                   theme === key
-                    ? "bg-accent text-foreground"
-                    : "text-muted-foreground hover:bg-muted"
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:bg-white/10"
                 }`}
               >
                 <HugeiconsIcon
                   icon={Icon}
                   size={18}
                   className={`transition-all duration-75 ${
-                    theme === key ? "text-foreground" : "text-muted-foreground"
+                    theme === key ? "text-white" : "text-white/60"
                   }`}
                 />
                 <span>{text}</span>
@@ -204,7 +204,7 @@ const BottomMenu = () => {
         ref={hiddenRef}
         className="absolute left-[-9999px] top-[-9999px] invisible pointer-events-none"
       >
-        <div className="rounded-[18px] bg-background/95 border border-border py-1">
+        <div className="rounded-[24px] bg-black py-1">
           {content}
         </div>
       </div>
@@ -252,7 +252,7 @@ const BottomMenu = () => {
           >
             <div
               ref={elementRef}
-              className="rounded-[18px] bg-background/95 backdrop-blur-xl border border-border"
+              className="rounded-[24px] bg-black"
             >
               <AnimatePresence initial={false} mode="popLayout">
                 <motion.div
@@ -287,12 +287,12 @@ const BottomMenu = () => {
       </AnimatePresence>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-1 bg-background/95 backdrop-blur-xl border border-border rounded-[18px] p-1 mt-3 z-10">
+      <div className="flex items-center gap-1 bg-black rounded-[24px] p-1 mt-3 z-10">
         {MAIN_NAV.map(({ icon: Icon, name }) => (
           <button
             key={name}
-            className={`p-3 rounded-[16px] transition-all ${
-              view === name ? "bg-accent" : "hover:bg-muted"
+            className={`p-3 rounded-full transition-all ${
+              view === name ? "bg-white/10" : "hover:bg-white/10"
             }`}
             onClick={() => setView(view === name ? "default" : (name as any))}
           >
@@ -300,7 +300,7 @@ const BottomMenu = () => {
               icon={Icon}
               size={22}
               className={`transition-all ${
-                view === name ? "text-foreground" : "text-muted-foreground"
+                view === name ? "text-white" : "text-white/60"
               }`}
             />
           </button>
