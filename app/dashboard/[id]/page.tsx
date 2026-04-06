@@ -162,11 +162,11 @@ export default function FolderDetailPage() {
                       <motion.div
                         layoutId={`item-${active.value}-${selectedIndex}`}
                         className="rounded-2xl overflow-hidden"
+                        style={{ height: selectedItem.height }}
                       >
                         <img
                           src={selectedItem.url}
-                          className="w-full object-cover rounded-2xl"
-                          style={{ maxHeight: "60vh" }}
+                          className="w-full h-full object-cover rounded-2xl"
                           alt={selectedItem.title || "Detail view"}
                         />
                       </motion.div>
