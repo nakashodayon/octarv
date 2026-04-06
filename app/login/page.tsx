@@ -8,23 +8,26 @@ import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { login } from './actions'
 import { toast } from 'sonner'
-import { StatusButton, type ButtonStatus } from '@/components/status-button'
+import FamilyButton from '@/components/ui/family-button'
+
+type ButtonVariant = "loading" | "error" | "success" | undefined;
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
-  const [status, setStatus] = useState<ButtonStatus>("idle")
+  const [variant, setVariant] = useState<ButtonVariant>(undefined)
 
   const handleSubmit = async (formData: FormData) => {
-    setStatus("loading")
+    setVariant("loading")
     setError(null)
     
     const result = await login(formData)
     
     if (result?.error) {
       setError(result.error)
-      setStatus("idle")
+      setVariant("error")
+      setTimeout(() => setVariant(undefined), 2000)
     } else {
-      setStatus("success")
+      setVariant("success")
       toast.success("Signed in successfully!")
     }
   }
@@ -67,12 +70,17 @@ export default function LoginPage() {
             />
           </Field>
 
-          <StatusButton
-            status={status}
-            idleText="Sign in"
-            loadingText="Signing in"
-            successText="Success"
-          />
+          <FamilyButton
+            type="submit"
+            variant={variant}
+            text={{
+              loading: "Signing in...",
+              success: "Signed in!",
+              error: "Failed",
+            }}
+          >
+            Sign in
+          </FamilyButton>
         </form>
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
