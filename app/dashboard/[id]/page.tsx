@@ -104,7 +104,7 @@ export default function FolderDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen bg-background overflow-hidden">
       <MotionConfig transition={{ duration: 0.8 }}>
         {/* Header - only show when no detail view */}
         <AnimatePresence>
@@ -152,9 +152,9 @@ export default function FolderDetailPage() {
                 animate={{ width: "60%", opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ type: "spring", duration: 0.6, bounce: 0.15 }}
-                className="h-screen overflow-hidden border-r border-border bg-background z-30 flex-shrink-0"
+                className="h-full overflow-hidden border-r border-border bg-background z-30 flex-shrink-0"
               >
-                <div className="h-full overflow-y-auto">
+                <div className="h-full overflow-y-auto overflow-x-hidden">
                   {/* Detail Header */}
                   <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border px-6 py-4">
                     <div className="flex items-center justify-between">
@@ -277,7 +277,7 @@ export default function FolderDetailPage() {
 
           {/* Pinterest Grid (Right or Full) */}
           <motion.div 
-            className="flex-1 h-screen overflow-y-auto"
+            className="flex-1 h-full overflow-y-auto"
             animate={{ 
               paddingTop: selectedItem ? "1.5rem" : "5rem",
             }}
