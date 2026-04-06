@@ -125,17 +125,31 @@ export default function FolderDetailPage() {
               {filteredData.map((item, idx) => (
                 <motion.div
                   key={`${active.value}-${idx}`}
-                  className="relative mb-4 overflow-hidden rounded-xl break-inside-avoid"
+                  className="relative mb-4 overflow-hidden rounded-xl break-inside-avoid group cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
                 >
                   <img
                     src={item.url}
-                    className="w-full object-cover rounded-xl"
+                    className="w-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                     style={{ height: item.height }}
                     alt={`${active.name} item ${idx + 1}`}
                   />
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col justify-end p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+                        AI
+                      </span>
+                    </div>
+                    <p className="text-white text-sm font-bold line-clamp-2">
+                      {active.name} Item {idx + 1}
+                    </p>
+                    <p className="text-white/70 text-xs mt-1">
+                      Auto-tagged by AI
+                    </p>
+                  </div>
                 </motion.div>
               ))}
             </motion.div>
