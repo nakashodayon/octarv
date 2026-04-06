@@ -10,7 +10,7 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, Tag, FileText, Heart, MessageCircle, Share2, MoreHorizontal, Bookmark } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, FileText } from "lucide-react";
 import BottomMenu from "@/components/bottom-menu";
 import { AnimatedTags, TagItem } from "@/components/ui/animated-tags";
 
@@ -157,25 +157,12 @@ export default function FolderDetailPage() {
                 <div className="h-full overflow-y-auto overflow-x-hidden">
                   {/* Detail Header */}
                   <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border px-6 py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={handleClose}
-                          className="p-2 rounded-full hover:bg-muted transition-colors"
-                        >
-                          <ArrowLeft className="size-5" />
-                        </button>
-                        <div className="flex items-center gap-2">
-                          <Heart className="size-5 text-muted-foreground hover:text-red-500 cursor-pointer transition-colors" />
-                          <span className="text-sm font-medium">{selectedItem.likes || 0}</span>
-                        </div>
-                        <MessageCircle className="size-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
-                        <Share2 className="size-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
-                        <MoreHorizontal className="size-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
-                      </div>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full font-bold text-sm hover:opacity-90 transition-opacity">
-                        <Bookmark className="size-4" />
-                        Save
+                    <div className="flex items-center">
+                      <button
+                        onClick={handleClose}
+                        className="p-2 rounded-full hover:bg-muted transition-colors"
+                      >
+                        <ArrowLeft className="size-5" />
                       </button>
                     </div>
                   </div>
@@ -255,20 +242,7 @@ export default function FolderDetailPage() {
                       </div>
                     )}
 
-                    {/* Comments Section */}
-                    <div className="border-t border-border pt-6">
-                      <h3 className="font-bold mb-4">No comments yet</h3>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          <span className="text-xs font-bold">Y</span>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Add a comment to start the conversation"
-                          className="flex-1 bg-muted rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                        />
-                      </div>
-                    </div>
+                    
                   </div>
                 </div>
               </motion.div>
