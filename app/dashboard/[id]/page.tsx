@@ -84,16 +84,16 @@ export default function FolderDetailPage() {
         {/* Header */}
         <div className="fixed top-0 left-0 right-0 z-40">
           <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center">
+            <div className="flex items-center gap-2 bg-background/80 backdrop-blur-xl border border-border rounded-full px-4 py-2 shadow-sm">
               <button
                 onClick={() => router.push("/dashboard")}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <ArrowLeft className="size-5" />
-                <span className="font-medium">Home</span>
+                <ArrowLeft className="size-4" />
+                <span className="text-sm font-medium">Home</span>
               </button>
-              <span className="mx-2 text-muted-foreground">/</span>
-              <span className="font-semibold">{folderTitle}</span>
+              <span className="text-muted-foreground">/</span>
+              <span className="text-sm font-semibold">{folderTitle}</span>
             </div>
             <div className="absolute left-1/2 -translate-x-1/2">
               <DynamicScrollIslandTOC
