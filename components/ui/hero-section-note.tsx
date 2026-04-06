@@ -19,7 +19,7 @@ export default function HeroSection() {
                         <Button
                             asChild
                             variant="default">
-                            <Link href="#link">
+                            <Link href="/login">
                                 <span className="text-nowrap">Get Started</span>
                             </Link>
                         </Button>
