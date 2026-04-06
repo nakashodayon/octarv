@@ -2,28 +2,29 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { BookOpen, Loader2 } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signup } from './actions'
 import { toast } from 'sonner'
+import { StatusButton, type ButtonStatus } from '@/components/status-button'
 
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [status, setStatus] = useState<ButtonStatus>("idle")
 
   const handleSubmit = async (formData: FormData) => {
-    setIsLoading(true)
+    setStatus("loading")
     setError(null)
     
     const result = await signup(formData)
     
     if (result?.error) {
       setError(result.error)
-      setIsLoading(false)
+      setStatus("idle")
     } else {
+      setStatus("success")
       toast.success("Account created successfully!")
     }
   }
@@ -77,10 +78,12 @@ export default function SignupPage() {
             />
           </Field>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="size-4 animate-spin" />}
-            {isLoading ? "Creating account..." : "Sign up"}
-          </Button>
+          <StatusButton
+            status={status}
+            idleText="Sign up"
+            loadingText="Creating"
+            successText="Success"
+          />
         </form>
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
