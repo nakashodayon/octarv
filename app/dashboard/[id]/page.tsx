@@ -146,9 +146,6 @@ export default function FolderDetailPage() {
                     <p className="text-white text-sm font-bold line-clamp-2">
                       {active.name} Item {idx + 1}
                     </p>
-                    <p className="text-white/70 text-xs mt-1">
-                      Auto-tagged by AI
-                    </p>
                   </div>
                 </motion.div>
               ))}
