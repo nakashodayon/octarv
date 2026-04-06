@@ -250,7 +250,7 @@ export default function FolderDetailPage() {
                             id: `${tag}-${i}`,
                             label: tag,
                           }))}
-                          editable={false}
+                          editable={true}
                         />
                       </div>
                     )}
