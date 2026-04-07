@@ -13,6 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Tag, FileText } from "lucide-react";
 import BottomMenu from "@/components/bottom-menu";
 import { AnimatedTags, TagItem } from "@/components/ui/animated-tags";
+import { TweetMock } from "@/components/ui/tweet-mock";
 
 const TOC_DATA: TOC_INTERFACE[] = [
   { name: "All" },
@@ -31,6 +32,15 @@ interface DataItem {
   category?: string;
   author?: string;
   likes?: number;
+  type?: "image" | "tweet";
+  tweet?: {
+    username: string;
+    handle: string;
+    content: string;
+    verified?: boolean;
+    retweets?: number;
+    replies?: number;
+  };
 }
 
 const DATA: Record<string, DataItem[]> = {
@@ -51,7 +61,10 @@ const DATA: Record<string, DataItem[]> = {
   ],
   notes: [
     { url: "https://images.unsplash.com/photo-1517842645767-c639042777db?q=70&w=500", height: 260, title: "Daily Journal", description: "Personal reflections and goal tracking entries.", tags: ["Personal", "Journal"], date: "2026-03-22", category: "notes", author: "Emma Davis", likes: 31 },
+    { url: "", height: 280, title: "Ken AI Insight", description: "Thoughts on AI development and the future of technology.", tags: ["AI", "Tech", "Twitter"], date: "2026-04-05", category: "notes", author: "Ken AI", likes: 1842, type: "tweet", tweet: { username: "Ken AI", handle: "xxkenai", content: "AIの進化は止まらない。でも大切なのは、テクノロジーを使う人間の創造性と判断力。ツールは進化しても、本質的な価値を生み出すのは常に人間だ。", verified: true, retweets: 324, replies: 89 } },
+    { url: "", height: 240, title: "Design Inspiration Tweet", description: "A thought-provoking tweet about design systems and component architecture.", tags: ["Design", "Twitter"], date: "2026-03-20", category: "notes", author: "Sarah Design", likes: 256, type: "tweet", tweet: { username: "Sarah Design", handle: "sarahdesigns", content: "The best design systems are the ones that feel invisible. They empower teams to build consistently without thinking about it.", verified: true, retweets: 42, replies: 18 } },
     { url: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=70&w=500", height: 300, title: "Study Notes", description: "Key concepts and learning summaries from courses.", tags: ["Study", "Learning"], date: "2026-03-19", category: "notes", author: "Ryan Smith", likes: 47 },
+    { url: "", height: 280, title: "Product Insight Tweet", description: "An insightful tweet about product development and user experience.", tags: ["Product", "UX"], date: "2026-03-18", category: "notes", author: "Alex Product", likes: 384, type: "tweet", tweet: { username: "Alex Product", handle: "alexbuilds", content: "Your users don't care about your tech stack. They care about solving their problems. Build for outcomes, not features.", verified: true, retweets: 89, replies: 34 } },
     { url: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=70&w=500", height: 280, title: "Creative Ideas", description: "Brainstorming session for new project concepts.", tags: ["Creative", "Ideas"], date: "2026-03-17", category: "notes", author: "Sophie Miller", likes: 62 },
     { url: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?q=70&w=500", height: 320, title: "Task List", description: "Weekly priorities and action items breakdown.", tags: ["Productivity", "Tasks"], date: "2026-03-15", category: "notes", author: "Kevin Zhang", likes: 28 },
     { url: "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?q=70&w=500", height: 240, title: "Quick Notes", description: "Random thoughts and quick capture snippets.", tags: ["Quick", "Capture"], date: "2026-03-13", category: "notes", author: "Amy Taylor", likes: 15 },
@@ -116,16 +129,16 @@ export default function FolderDetailPage() {
               className="fixed top-0 left-0 right-0 z-40"
             >
               <div className="flex items-center justify-between px-6 py-4">
-                <div className="flex items-center gap-2 bg-background/80 backdrop-blur-xl border border-border rounded-full px-4 py-2 shadow-sm">
+                <div className="flex items-center gap-2 bg-black rounded-full px-4 py-2 shadow-sm">
                   <button
                     onClick={() => router.push("/dashboard")}
-                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
                   >
                     <ArrowLeft className="size-4" />
                     <span className="text-sm font-bold">Home</span>
                   </button>
-                  <span className="text-muted-foreground">/</span>
-                  <span className="text-sm font-bold">{folderTitle}</span>
+                  <span className="text-white/60">/</span>
+                  <span className="text-sm font-bold text-white">{folderTitle}</span>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2">
                   <DynamicScrollIslandTOC
@@ -265,23 +278,39 @@ export default function FolderDetailPage() {
                       transition={{ delay: idx * 0.03 }}
                       onClick={() => handleItemClick(item, idx)}
                     >
-                      <img
-                        src={item.url}
-                        className="w-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
-                        style={{ height: item.height }}
-                        alt={item.title || `${active.name} item ${idx + 1}`}
-                      />
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col justify-end p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs font-bold rounded-full">
-                            AI
-                          </span>
-                        </div>
-                        <p className="text-white text-sm font-bold line-clamp-2">
-                          {item.title || `${active.name} Item ${idx + 1}`}
-                        </p>
-                      </div>
+                      {item.type === "tweet" && item.tweet ? (
+                        <TweetMock
+                          username={item.tweet.username}
+                          handle={item.tweet.handle}
+                          content={item.tweet.content}
+                          verified={item.tweet.verified}
+                          likes={item.likes}
+                          retweets={item.tweet.retweets}
+                          replies={item.tweet.replies}
+                          date={item.date}
+                          className="transition-transform duration-300 group-hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <>
+                          <img
+                            src={item.url}
+                            className="w-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+                            style={{ height: item.height }}
+                            alt={item.title || `${active.name} item ${idx + 1}`}
+                          />
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col justify-end p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+                                AI
+                              </span>
+                            </div>
+                            <p className="text-white text-sm font-bold line-clamp-2">
+                              {item.title || `${active.name} Item ${idx + 1}`}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </motion.div>
                   ))}
                 </motion.div>
