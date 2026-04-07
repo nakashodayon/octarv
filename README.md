@@ -1,35 +1,87 @@
-# octarv
+# Octarv
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+A personal knowledge base for X (Twitter) bookmarks, with AI agents that research topics and curate findings into your folders every day.
 
-## Built with v0
+## What it does
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- **Bookmarks pipeline** — connects your X account, imports bookmarks, auto-tags them with Grok, and organizes them into folders.
+- **Tag-based folder filters** — define `match_tags` on a folder and any tweet whose tags overlap shows up there automatically.
+- **Research agents** — create projects with a topic, target folders, and an engagement filter. Agents run daily (or on demand), search X with Grok, and write a Markdown report with embedded tweet cards.
+- **Rich report viewer** — left-side scrollspy TOC, tweet embeds, link chips with og previews, and carousel grouping for consecutive posts.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_pBA1unFZTKxhL4K5xNzBzJTYAJpj)
+## Stack
 
-## Getting Started
+- Next.js 16 (App Router, Turbopack)
+- Bun (package manager and runtime)
+- Neon Postgres
+- Vercel AI SDK + `@ai-sdk/xai` (Grok responses API + xSearch / webSearch tools)
+- shadcn/ui + Tailwind + framer-motion
+- react-tweet for X embeds
 
-First, run the development server:
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+bun install
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Required environment variables
 
-## Learn More
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string |
+| `XAI_API_KEY` | Grok / xSearch / webSearch |
+| `X_BEARER_TOKEN` | App-level X API v2 (tweet fetch) |
+| `X_OAUTH_CLIENT_ID` | X OAuth (user bookmarks import) |
+| `X_OAUTH_CLIENT_SECRET` | Same |
+| `X_OAUTH_REDIRECT_URI` | `<base-url>/api/auth/x/callback` |
+| `CRON_SECRET` | Auth for `/api/cron/*` endpoints |
 
-To learn more, take a look at the following resources:
+### Useful commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+```bash
+bun run dev         # start dev server (Turbopack)
+bun run build       # production build
+bun run typecheck   # tsc --noEmit
+bun run lint        # eslint
+bun run format      # prettier
+```
 
-<a href="https://v0.app/chat/api/kiro/clone/showtah/octarv" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+## Project layout
+
+```
+app/
+  agents/           # research agents page + project detail + run report viewer
+  api/
+    auth/x/         # X OAuth connect + callback
+    bookmarks/      # bookmarks import + status
+    cron/           # vercel cron handlers
+    folders/        # folders CRUD with match_tags
+    research/       # research projects, runs, run trigger
+    tweets/         # saved tweets CRUD + tag generation
+  dashboard/        # folders list + folder detail (gallery)
+  onboarding/       # connect-X-account flow
+lib/
+  bookmarks-pipeline.ts   # fetch -> save -> AI tag
+  research-agent.ts       # Experimental_Agent + xai.responses + tools
+  research-tools.ts       # content_search, content_create
+  x.ts                    # X API normalize (handles retweets + quoted)
+  x-oauth.ts              # X OAuth tokens
+components/
+  ui/                     # shadcn-style components
+```
+
+## Conventions
+
+- **Bun only.** No npm/yarn/pnpm.
+- **shadcn/ui first.** Add components via the `shadcn` CLI when possible.
+- **`components/`** holds all reusable UI. Don't drop generic components in `app/`.
+- See `CLAUDE.md` for the full development rules used by AI assistants.
+
+## Deploy
+
+This is a Vercel project. Push to `main` and Vercel rebuilds. Environment variables must be set in the Vercel dashboard before the first deploy.
+
+For OAuth, the X Developer Portal callback list must include the production URL: `https://<your-domain>/api/auth/x/callback`.
