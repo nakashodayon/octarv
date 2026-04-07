@@ -2,34 +2,38 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { login } from './actions'
-import { toast } from 'sonner'
 import FamilyButton from '@/components/ui/family-button'
 
 type ButtonVariant = "loading" | "error" | "success" | undefined;
 
 export default function LoginPage() {
+  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [variant, setVariant] = useState<ButtonVariant>(undefined)
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
     setVariant("loading")
     setError(null)
-    
+
     const result = await login(formData)
-    
+
     if (result?.error) {
       setError(result.error)
       setVariant("error")
       setTimeout(() => setVariant(undefined), 2000)
-    } else {
-      setVariant("success")
-      toast.success("Signed in successfully!")
+      return
     }
+
+    setVariant("success")
+    setTimeout(() => router.push("/dashboard"), 1200)
   }
 
   return (
@@ -43,7 +47,7 @@ export default function LoginPage() {
           <p className="text-muted-foreground mt-2 text-sm">Sign in to your account</p>
         </div>
 
-        <form action={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
               {error}

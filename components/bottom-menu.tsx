@@ -13,6 +13,7 @@ import {
   PencilEdit02Icon,
   FilterHorizontalIcon,
   AutoConversationsIcon,
+  NewTwitterIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useMemo, useState, useRef, useEffect } from "react";
@@ -20,6 +21,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import useMeasure from "react-use-measure";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { logout } from "@/app/logout/actions";
+import BottomSheet from "@/components/ui/bottom-sheet";
+import { Kbd } from "@/components/ui/kbd";
 
 const MAIN_NAV = [
   { icon: PlusSignIcon, name: "home" },
@@ -33,6 +39,7 @@ const HOME_ITEMS = [
   { icon: PencilEdit02Icon, text: "Note" },
   { icon: Mic01Icon, text: "Voice" },
   { icon: Camera01Icon, text: "Screenshot" },
+  { icon: NewTwitterIcon, text: "Tweet" },
 ];
 
 const SEARCH_OPTIONS = [
@@ -50,16 +57,113 @@ const THEME_OPTIONS = [
   { key: "system", icon: ComputerIcon, text: "System" },
 ];
 
-const BottomMenu = () => {
+interface BottomMenuProps {
+  onTweetAdded?: (tweetId: string, folderId: string) => void;
+  currentFolderId?: string;
+}
+
+const BottomMenu = ({ onTweetAdded, currentFolderId }: BottomMenuProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [elementRef] = useMeasure();
   const [hiddenRef, hiddenBounds] = useMeasure();
   const [view, setView] = useState<
     "default" | "home" | "search" | "notifications" | "profile" | "theme"
   >("default");
+  const [tweetUrl, setTweetUrl] = useState("");
+  const [tweetStep, setTweetStep] = useState<"closed" | "folder" | "input">("closed");
+  const [tweetError, setTweetError] = useState<string | null>(null);
+  const [folders, setFolders] = useState<Array<{ id: string; name: string }>>([]);
+  const [pickedFolderId, setPickedFolderId] = useState<string | null>(null);
 
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const startTweetFlow = () => {
+    if (currentFolderId) {
+      setPickedFolderId(currentFolderId);
+      setTweetStep("input");
+    } else {
+      // Fetch folders and show picker
+      fetch("/api/folders")
+        .then((r) => (r.ok ? r.json() : []))
+        .then((rows: Array<{ id: string; name: string }>) => setFolders(rows))
+        .catch(() => {});
+      setTweetStep("folder");
+    }
+  };
+
+  const resetTweetFlow = () => {
+    setTweetStep("closed");
+    setTweetUrl("");
+    setTweetError(null);
+    setPickedFolderId(null);
+  };
+
+  const handleTweetSubmit = async () => {
+    const match = tweetUrl.match(/(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/);
+    if (!match) {
+      setTweetError("Invalid X URL");
+      return;
+    }
+    if (!pickedFolderId) {
+      setTweetError("Pick a folder");
+      return;
+    }
+    const tweetId = match[1];
+    // "all" is virtual — save to the first real folder under the hood
+    const realFolderId =
+      pickedFolderId === "all" ? folders[0]?.id ?? null : pickedFolderId;
+    if (!realFolderId) {
+      setTweetError("No folders available");
+      return;
+    }
+
+    if (currentFolderId) {
+      // We're inside a folder page — let the parent handle save + tag + toast UX
+      onTweetAdded?.(tweetId, realFolderId);
+    } else {
+      // Home flow — save directly then navigate so the destination page shows it
+      fetch("/api/tweets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tweetId, folderId: realFolderId }),
+      })
+        .then(() =>
+          fetch("/api/tweets/tag", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tweetId }),
+          })
+        )
+        .catch((e) => console.error("Save tweet failed:", e));
+      router.push(`/dashboard/${pickedFolderId}`);
+    }
+
+    resetTweetFlow();
+    setView("default");
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+    router.refresh();
+  };
   
+  // Cmd+X shortcut to open the tweet flow
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "x") {
+        e.preventDefault();
+        setView("home");
+        startTweetFlow();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFolderId]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -85,11 +189,81 @@ const BottomMenu = () => {
         return null;
 
       case "home":
+        if (tweetStep === "folder") {
+          return (
+            <div className="p-[6px] py-2 min-w-[240px]">
+              <div className="flex items-center gap-2 px-2 pb-1">
+                <button
+                  onClick={resetTweetFlow}
+                  className="text-white/40 hover:text-white transition-colors"
+                >
+                  <ArrowLeft className="size-3.5" />
+                </button>
+                <span className="text-white/60 text-xs">Pick a folder</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                {[{ id: "all", name: "All" }, ...folders].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => {
+                      setPickedFolderId(f.id);
+                      setTweetStep("input");
+                    }}
+                    className={`${sharedHover} flex items-center gap-3`}
+                  >
+                    <span className="transition-all duration-75">{f.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        if (tweetStep === "input") {
+          return (
+            <div className="p-[6px] py-2 min-w-[280px]">
+              <div className="flex items-center gap-2 px-2 pb-1">
+                <button
+                  onClick={() =>
+                    currentFolderId ? resetTweetFlow() : setTweetStep("folder")
+                  }
+                  className="text-white/40 hover:text-white transition-colors"
+                >
+                  <ArrowLeft className="size-3.5" />
+                </button>
+                <span className="text-white/60 text-xs">Paste X URL</span>
+              </div>
+              <div className="flex flex-col gap-1.5 px-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    autoFocus
+                    type="url"
+                    value={tweetUrl}
+                    onChange={(e) => { setTweetUrl(e.target.value); setTweetError(null); }}
+                    onKeyDown={(e) => e.key === "Enter" && handleTweetSubmit()}
+                    placeholder="https://x.com/user/status/..."
+                    className="flex-1 bg-white/10 text-white text-sm placeholder:text-white/30 rounded-full px-3 py-1.5 outline-none focus:ring-1 focus:ring-white/30"
+                  />
+                  <button
+                    onClick={handleTweetSubmit}
+                    disabled={!tweetUrl.trim()}
+                    className="text-xs px-3 py-1.5 rounded-full bg-white text-black font-medium disabled:opacity-30 transition-opacity"
+                  >
+                    Add
+                  </button>
+                </div>
+                {tweetError && (
+                  <p className="text-red-400 text-xs px-1">{tweetError}</p>
+                )}
+              </div>
+            </div>
+          );
+        }
         return (
-          <div className="space-y-0.5 min-w-[210px] p-[6px] py-0.5">
+          <div className="space-y-0.5 min-w-[230px] p-[6px] py-0.5">
             {HOME_ITEMS.map(({ icon: Icon, text }) => (
               <button
                 key={text}
+                onClick={text === "Tweet" ? startTweetFlow : undefined}
                 className={`${sharedHover} flex items-center gap-3`}
               >
                 <HugeiconsIcon
@@ -97,7 +271,8 @@ const BottomMenu = () => {
                   size={20}
                   className="text-white/60 group-hover:text-white transition-all duration-75"
                 />
-                <span className="transition-all duration-75">{text}</span>
+                <span className="transition-all duration-75 flex-1 text-left">{text}</span>
+                {text === "Tweet" && <Kbd>⌘ X</Kbd>}
               </button>
             ))}
           </div>
@@ -152,12 +327,19 @@ const BottomMenu = () => {
         return (
           <div className="space-y-0.5 min-w-[230px] p-[6px] py-0.5">
             {PROFILE_LINKS.map((t) => (
-              <button key={t} className={sharedHover}>
+              <button
+                key={t}
+                className={sharedHover}
+                onClick={t === "Settings" ? () => { setSettingsOpen(true); setView("default"); } : undefined}
+              >
                 <span className="transition-all duration-75">{t}</span>
               </button>
             ))}
             <div className="border-t border-white/10 my-[2px]" />
-            <button className="px-3 py-2 text-[15px] text-red-400 w-full text-left rounded-full hover:bg-red-500/10 transition-all duration-75">
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2 text-[15px] text-red-400 w-full text-left rounded-full hover:bg-red-500/10 transition-all duration-75"
+            >
               Logout
             </button>
           </div>
@@ -192,9 +374,25 @@ const BottomMenu = () => {
       default:
         return null;
     }
-  }, [view, theme]);
+  }, [view, theme, tweetStep, tweetUrl, folders, currentFolderId]);
 
   return (
+    <>
+    <BottomSheet open={settingsOpen} close={() => setSettingsOpen(false)} title="Settings">
+      <div className="flex items-center justify-between px-6 pt-4 pb-8">
+        <div className="size-16 rounded-full overflow-hidden flex-shrink-0 shadow-lg">
+          <img
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=160"
+            alt="Profile"
+            className="size-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col gap-0.5 text-right">
+          <span className="text-2xl font-bold">Shota Nakayama</span>
+          <span className="text-sm text-muted-foreground">@shotanakayama</span>
+        </div>
+      </div>
+    </BottomSheet>
     <div
       ref={containerRef}
       className={cn("relative flex flex-col items-center")}
@@ -256,7 +454,7 @@ const BottomMenu = () => {
             >
               <AnimatePresence initial={false} mode="popLayout">
                 <motion.div
-                  key={view}
+                  key={view === "home" ? `home-${tweetStep}` : view}
                   initial={{
                     opacity: 0,
                     scale: 0.96,
@@ -294,7 +492,10 @@ const BottomMenu = () => {
             className={`p-3 rounded-full transition-all ${
               view === name ? "bg-white/10" : "hover:bg-white/10"
             }`}
-            onClick={() => setView(view === name ? "default" : (name as any))}
+            onClick={() => {
+                if (name !== "home") resetTweetFlow();
+                setView(view === name ? "default" : (name as any));
+              }}
           >
             <HugeiconsIcon
               icon={Icon}
@@ -307,6 +508,7 @@ const BottomMenu = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };
 

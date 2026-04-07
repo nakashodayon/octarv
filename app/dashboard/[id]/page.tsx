@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DynamicScrollIslandTOC, { TOC_INTERFACE } from "@/components/ui/dynamic-scroll-island-toc";
 import {
   AnimatePresence,
@@ -13,7 +13,9 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Tag, FileText } from "lucide-react";
 import BottomMenu from "@/components/bottom-menu";
 import { AnimatedTags, TagItem } from "@/components/ui/animated-tags";
-import { TweetMock } from "@/components/ui/tweet-mock";
+import { XTweetCard, XTweetCardSkeleton } from "@/components/ui/x-tweet-card";
+import { FolderTagsEditor } from "@/components/folder-tags-editor";
+import { sileo, Toaster } from "sileo";
 
 const TOC_DATA: TOC_INTERFACE[] = [
   { name: "All" },
@@ -32,43 +34,14 @@ interface DataItem {
   category?: string;
   author?: string;
   likes?: number;
-  type?: "image" | "tweet";
-  tweet?: {
-    username: string;
-    handle: string;
-    content: string;
-    verified?: boolean;
-    retweets?: number;
-    replies?: number;
-  };
+  type?: "image" | "tweet" | "pending";
+  tweetId?: string;
 }
 
 const DATA: Record<string, DataItem[]> = {
-  documents: [
-    { url: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=70&w=500", height: 280, title: "Project Proposal", description: "Q4 strategic planning document for the upcoming product launch.", tags: ["Business", "Strategy"], date: "2026-03-15", category: "documents", author: "Sarah Chen", likes: 42 },
-    { url: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=70&w=500", height: 320, title: "Financial Report", description: "Annual financial summary with key metrics and projections.", tags: ["Finance", "Report"], date: "2026-03-10", category: "documents", author: "James Liu", likes: 38 },
-    { url: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=70&w=500", height: 240, title: "Meeting Notes", description: "Summary of client discussion and action items.", tags: ["Meeting", "Client"], date: "2026-03-08", category: "documents", author: "Emily Park", likes: 24 },
-    { url: "https://images.unsplash.com/photo-1568667256549-094345857637?q=70&w=500", height: 300, title: "Research Paper", description: "Market analysis and competitive landscape overview.", tags: ["Research", "Analysis"], date: "2026-03-05", category: "documents", author: "David Kim", likes: 56 },
-    { url: "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?q=70&w=500", height: 260, title: "Contract Draft", description: "Service agreement template for new partnerships.", tags: ["Legal", "Contract"], date: "2026-03-01", category: "documents", author: "Lisa Wang", likes: 19 },
-  ],
-  images: [
-    { url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=70&w=500", height: 320, title: "Mountain Vista", description: "Breathtaking alpine landscape captured at sunrise.", tags: ["Nature", "Mountains"], date: "2026-03-20", category: "images", author: "Alex Turner", likes: 127 },
-    { url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=70&w=500", height: 280, title: "Forest Path", description: "Serene walking trail through ancient woodland.", tags: ["Nature", "Forest"], date: "2026-03-18", category: "images", author: "Maya Johnson", likes: 89 },
-    { url: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=70&w=500", height: 360, title: "Autumn Colors", description: "Vibrant fall foliage reflecting on calm waters.", tags: ["Nature", "Autumn"], date: "2026-03-16", category: "images", author: "Chris Lee", likes: 156 },
-    { url: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=70&w=500", height: 300, title: "Waterfall", description: "Majestic cascade in a tropical rainforest setting.", tags: ["Nature", "Water"], date: "2026-03-14", category: "images", author: "Nina Chen", likes: 203 },
-    { url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=70&w=500", height: 340, title: "Lake Reflection", description: "Perfect mirror image on a peaceful morning.", tags: ["Nature", "Lake"], date: "2026-03-12", category: "images", author: "Tom Wilson", likes: 178 },
-    { url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=70&w=500", height: 280, title: "Misty Valley", description: "Ethereal fog rolling through mountain valley.", tags: ["Nature", "Landscape"], date: "2026-03-10", category: "images", author: "Julia Brown", likes: 94 },
-  ],
-  notes: [
-    { url: "https://images.unsplash.com/photo-1517842645767-c639042777db?q=70&w=500", height: 260, title: "Daily Journal", description: "Personal reflections and goal tracking entries.", tags: ["Personal", "Journal"], date: "2026-03-22", category: "notes", author: "Emma Davis", likes: 31 },
-    { url: "", height: 280, title: "Ken AI Insight", description: "Thoughts on AI development and the future of technology.", tags: ["AI", "Tech", "Twitter"], date: "2026-04-05", category: "notes", author: "Ken AI", likes: 1842, type: "tweet", tweet: { username: "Ken AI", handle: "xxkenai", content: "AIの進化は止まらない。でも大切なのは、テクノロジーを使う人間の創造性と判断力。ツールは進化しても、本質的な価値を生み出すのは常に人間だ。", verified: true, retweets: 324, replies: 89 } },
-    { url: "", height: 240, title: "Design Inspiration Tweet", description: "A thought-provoking tweet about design systems and component architecture.", tags: ["Design", "Twitter"], date: "2026-03-20", category: "notes", author: "Sarah Design", likes: 256, type: "tweet", tweet: { username: "Sarah Design", handle: "sarahdesigns", content: "The best design systems are the ones that feel invisible. They empower teams to build consistently without thinking about it.", verified: true, retweets: 42, replies: 18 } },
-    { url: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=70&w=500", height: 300, title: "Study Notes", description: "Key concepts and learning summaries from courses.", tags: ["Study", "Learning"], date: "2026-03-19", category: "notes", author: "Ryan Smith", likes: 47 },
-    { url: "", height: 280, title: "Product Insight Tweet", description: "An insightful tweet about product development and user experience.", tags: ["Product", "UX"], date: "2026-03-18", category: "notes", author: "Alex Product", likes: 384, type: "tweet", tweet: { username: "Alex Product", handle: "alexbuilds", content: "Your users don't care about your tech stack. They care about solving their problems. Build for outcomes, not features.", verified: true, retweets: 89, replies: 34 } },
-    { url: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=70&w=500", height: 280, title: "Creative Ideas", description: "Brainstorming session for new project concepts.", tags: ["Creative", "Ideas"], date: "2026-03-17", category: "notes", author: "Sophie Miller", likes: 62 },
-    { url: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?q=70&w=500", height: 320, title: "Task List", description: "Weekly priorities and action items breakdown.", tags: ["Productivity", "Tasks"], date: "2026-03-15", category: "notes", author: "Kevin Zhang", likes: 28 },
-    { url: "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?q=70&w=500", height: 240, title: "Quick Notes", description: "Random thoughts and quick capture snippets.", tags: ["Quick", "Capture"], date: "2026-03-13", category: "notes", author: "Amy Taylor", likes: 15 },
-  ],
+  documents: [],
+  images: [],
+  notes: [],
 };
 
 const animation: MotionProps = {
@@ -85,26 +58,206 @@ export default function FolderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const folderId = params.id as string;
-  const folderTitle = folderId.charAt(0).toUpperCase() + folderId.slice(1);
+  const isAll = folderId === "all";
 
+  const [folderTitle, setFolderTitle] = useState<string>(isAll ? "All" : "…");
+  const [folderMatchTags, setFolderMatchTags] = useState<string[]>([]);
+  const [defaultFolderId, setDefaultFolderId] = useState<string | null>(null);
   const [active, _setActive] = useState(TOC_DATA[0]);
   const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const [savedTweets, setSavedTweets] = useState<DataItem[]>([]);
+  const [sessionNewIds, setSessionNewIds] = useState<string[]>([]);
+
+  // Load folder name + default folder for "all" view
+  useEffect(() => {
+    fetch("/api/folders")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((folders: Array<{ id: string; name: string; match_tags?: string[] }>) => {
+        if (folders.length > 0) setDefaultFolderId(folders[0].id);
+        if (!isAll) {
+          const f = folders.find((x) => x.id === folderId);
+          if (f) {
+            setFolderTitle(f.name);
+            setFolderMatchTags(f.match_tags ?? []);
+          }
+        }
+      })
+      .catch(() => {});
+  }, [folderId, isAll]);
+
+  // Load saved tweets from DB (filtered by folder unless "all")
+  useEffect(() => {
+    const url = isAll ? "/api/tweets" : `/api/tweets?folderId=${folderId}`;
+    fetch(url)
+      .then((r) => r.ok ? r.json() : [])
+      .then((rows: Array<{ tweet_id: string; tweet_data: any; tags: string[]; ai_title: string | null; ai_description: string | null; created_at: string }>) => {
+        setSavedTweets(rows.map((row) => ({
+          url: "",
+          height: 280,
+          type: "tweet" as const,
+          tweetId: row.tweet_id,
+          title: row.ai_title ?? row.tweet_data?.author?.name ?? "Tweet",
+          description: row.ai_description ?? row.tweet_data?.text?.slice(0, 120),
+          category: "notes",
+          date: row.created_at?.slice(0, 10),
+          tags: row.tags ?? [],
+        })));
+      })
+      .catch(() => {});
+  }, [folderId, isAll]);
+
+  const toastBase = {
+    fill: "#0a0a0a",
+    roundness: 18,
+    styles: {
+      title: "text-white! text-sm! font-medium!",
+      description: "text-white/50! text-xs!",
+      badge: "bg-white/10!",
+    },
+  };
+
+  const handleTweetAdded = (tweetId: string, targetFolderId: string) => {
+    setSessionNewIds((prev) => [tweetId, ...prev.filter((id) => id !== tweetId)]);
+    setSavedTweets((prev) => [
+      { url: "", height: 280, type: "pending", tweetId, category: "notes" },
+      ...prev.filter((t) => t.tweetId !== tweetId),
+    ]);
+
+    // Phase 1: fetch tweet — toast resolves as soon as card is ready
+    const fetchPromise = fetch("/api/tweets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tweetId, folderId: targetFolderId }),
+    })
+      .then((r) => r.ok ? r.json() : Promise.reject(new Error("fetch failed")))
+      .then((data) => {
+        setSavedTweets((prev) =>
+          prev.map((t) =>
+            t.tweetId === tweetId
+              ? { ...t, type: "tweet" as const, title: data.author?.name ?? "Tweet", description: data.text?.slice(0, 120) }
+              : t
+          )
+        );
+
+        // Phase 2: trigger tag generation directly from client (no fire-and-forget on server)
+        fetch("/api/tweets/tag", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tweetId }),
+        })
+          .then(async (r) => {
+            const text = await r.text();
+            if (!r.ok) {
+              console.error("Tag API error:", r.status, text);
+              throw new Error(`tag failed: ${r.status} ${text}`);
+            }
+            return JSON.parse(text);
+          })
+          .then((res: { tags: string[]; title?: string; description?: string }) => {
+            setSavedTweets((prev) =>
+              prev.map((t) =>
+                t.tweetId === tweetId
+                  ? {
+                      ...t,
+                      tags: res.tags ?? t.tags,
+                      title: res.title ?? t.title,
+                      description: res.description ?? t.description,
+                    }
+                  : t
+              )
+            );
+          })
+          .catch((e) => {
+            console.error("Tag generation failed:", e);
+          });
+
+        return data;
+      });
+
+    sileo.promise(fetchPromise, {
+      loading: { ...toastBase, title: "タグ付け中" },
+      success: () => ({ ...toastBase, title: "完了", duration: 2000 }),
+      error: { ...toastBase, title: "失敗しました", duration: 2000 },
+    });
+
+    fetchPromise.catch(() => {
+      setSavedTweets((prev) => prev.filter((t) => t.tweetId !== tweetId));
+    });
+  };
+
+  // All unique tags across the user's tweets — used as autocomplete suggestions
+  const allTagSuggestions = useMemo(() => {
+    const set = new Set<string>();
+    savedTweets.forEach((t) => (t.tags ?? []).forEach((tag) => set.add(tag)));
+    return Array.from(set).sort();
+  }, [savedTweets]);
+
+  const updateTweetTags = (tweetId: string, nextTags: string[]) => {
+    setSavedTweets((prev) =>
+      prev.map((t) => (t.tweetId === tweetId ? { ...t, tags: nextTags } : t))
+    );
+    fetch("/api/tweets", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tweetId, tags: nextTags }),
+    }).catch((e) => console.error("Update tags failed:", e));
+  };
+
+  // Always reflect latest savedTweets data in the detail panel
+  const displayItem = useMemo(() => {
+    if (!selectedItem) return null;
+    if (selectedItem.tweetId) {
+      const live = savedTweets.find((t) => t.tweetId === selectedItem.tweetId);
+      return live ?? selectedItem;
+    }
+    return selectedItem;
+  }, [selectedItem, savedTweets]);
+
+  const notesData = useMemo(() => {
+    const staticNotes = DATA.notes.filter((n) => n.type !== "tweet");
+    return [...savedTweets, ...staticNotes];
+  }, [savedTweets]);
+
+  const dataWithSaved = useMemo(() => ({
+    ...DATA,
+    notes: notesData,
+  }), [notesData]);
 
   const all = useMemo(() => {
-    const arr = Object.keys(DATA).reduce<DataItem[]>((acc, key) => {
-      return acc.concat(DATA[key].map((item) => item));
+    const arr = Object.keys(dataWithSaved).reduce<DataItem[]>((acc, key) => {
+      return acc.concat(dataWithSaved[key as keyof typeof dataWithSaved].map((item) => item));
     }, []);
     return arr.sort(() => Math.random() - 0.5);
-  }, []);
+  }, [dataWithSaved]);
 
   function setActive(val: TOC_INTERFACE) {
     if (!val.value) _setActive(val);
     setTimeout(() => _setActive(val), 400);
   }
 
-  const filteredData = active.value ? DATA[active.value] : all;
+  const baseFilteredData = active.value ? dataWithSaved[active.value as keyof typeof dataWithSaved] ?? [] : all;
+
+  // When a tweet is selected, hide it from the gallery and sort by tag overlap.
+  const filteredData = useMemo(() => {
+    if (!selectedItem || !selectedItem.tweetId) return baseFilteredData;
+    const withoutSelected = baseFilteredData.filter(
+      (d) => d.tweetId !== selectedItem.tweetId
+    );
+    const selectedTags = new Set((selectedItem.tags ?? []).map((t) => t.toLowerCase()));
+    if (selectedTags.size === 0) return withoutSelected;
+
+    const score = (item: DataItem) => {
+      const itemTags = (item.tags ?? []).map((t) => t.toLowerCase());
+      let overlap = 0;
+      for (const t of itemTags) if (selectedTags.has(t)) overlap += 1;
+      return overlap;
+    };
+
+    return [...withoutSelected].sort((a, b) => score(b) - score(a));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseFilteredData, selectedItem?.tweetId, selectedItem?.tags?.join(",")]);
 
   const handleItemClick = (item: DataItem, idx: number) => {
     setSelectedItem(item);
@@ -118,6 +271,7 @@ export default function FolderDetailPage() {
 
   return (
     <div className="h-screen bg-background overflow-hidden">
+      <Toaster position="bottom-right" />
       <MotionConfig transition={{ duration: 0.8 }}>
         {/* Header - only show when no detail view */}
         <AnimatePresence>
@@ -149,7 +303,37 @@ export default function FolderDetailPage() {
                     lPrefix={folderId}
                   />
                 </div>
-                <div className="w-32" />
+                {!isAll ? (
+                  <div className="absolute right-6 top-4">
+                    <FolderTagsEditor
+                      folderId={folderId}
+                      initialTags={folderMatchTags}
+                      suggestions={allTagSuggestions}
+                      onChange={(next) => {
+                        setFolderMatchTags(next);
+                        // Refetch tweets so the new tag union takes effect
+                        fetch(`/api/tweets?folderId=${folderId}`)
+                          .then((r) => (r.ok ? r.json() : []))
+                          .then((rows: Array<{ tweet_id: string; tweet_data: any; tags: string[]; ai_title: string | null; ai_description: string | null; created_at: string }>) => {
+                            setSavedTweets(rows.map((row) => ({
+                              url: "",
+                              height: 280,
+                              type: "tweet" as const,
+                              tweetId: row.tweet_id,
+                              title: row.ai_title ?? row.tweet_data?.author?.name ?? "Tweet",
+                              description: row.ai_description ?? row.tweet_data?.text?.slice(0, 120),
+                              category: "notes",
+                              date: row.created_at?.slice(0, 10),
+                              tags: row.tags ?? [],
+                            })));
+                          })
+                          .catch(() => {});
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-32" />
+                )}
               </div>
             </motion.div>
           )}
@@ -162,83 +346,82 @@ export default function FolderDetailPage() {
             {selectedItem && selectedIndex !== null && (
               <motion.div
                 initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "60%", opacity: 1 }}
+                animate={{ width: 720, opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ type: "spring", duration: 0.6, bounce: 0.15 }}
                 className="h-full overflow-hidden border-r border-border bg-background z-30 flex-shrink-0"
               >
                 <div className="h-full overflow-y-auto overflow-x-hidden">
-                  {/* Detail Content */}
-                  <div className="p-6">
-                    {/* Image with overlaid back button */}
-                    <div className="relative mb-6">
-                      <motion.div
-                        layoutId={`item-${active.value}-${selectedIndex}`}
-                        className="rounded-2xl overflow-hidden w-full"
-                      >
-                        <img
-                          src={selectedItem.url}
-                          className="w-full object-cover rounded-2xl"
-                          alt={selectedItem.title || "Detail view"}
-                        />
-                      </motion.div>
-                      {/* Back button overlay */}
-                      <button
-                        onClick={handleClose}
-                        className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-xl hover:bg-background transition-colors z-10"
-                      >
-                        <ArrowLeft className="size-5" />
-                      </button>
-                    </div>
+                  {/* Detail Content: arrow on the left, content column to the right */}
+                  <div className="flex gap-4 p-6">
+                    <button
+                      onClick={handleClose}
+                      className="shrink-0 p-2 h-fit rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <ArrowLeft className="size-5" />
+                    </button>
 
-                    {/* Title & Description */}
-                    <h2 className="text-2xl font-bold mb-3">
-                      {selectedItem.title || `Item ${selectedIndex + 1}`}
-                    </h2>
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      {selectedItem.description || "No description available."}
-                    </p>
-
-                    {/* Metadata Grid */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      {selectedItem.date && (
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-                          <Calendar className="size-5 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">Date</p>
-                            <p className="text-sm font-medium">{selectedItem.date}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedItem.category && (
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-                          <FileText className="size-5 text-muted-foreground" />
-                          <div>
-                            <p className="text-xs text-muted-foreground">Category</p>
-                            <p className="text-sm font-medium capitalize">{selectedItem.category}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Tags */}
-                    {selectedItem.tags && selectedItem.tags.length > 0 && (
+                    <div className="flex-1 min-w-0 max-w-xl">
+                      {/* Image / Tweet */}
                       <div className="mb-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Tag className="size-4 text-muted-foreground" />
-                          <p className="text-sm font-medium text-muted-foreground">Tags</p>
-                        </div>
-                        <AnimatedTags
-                          tags={selectedItem.tags.map((tag, i) => ({
-                            id: `${tag}-${i}`,
-                            label: tag,
-                          }))}
-                          editable={true}
-                        />
+                        {selectedItem.type === "tweet" ? (
+                          <motion.div
+                            layoutId={`item-${active.value}-${selectedIndex}`}
+                            className="rounded-2xl overflow-hidden w-full"
+                          >
+                            <XTweetCard
+                              id={selectedItem.tweetId!}
+                              className="w-full"
+                            />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            layoutId={`item-${active.value}-${selectedIndex}`}
+                            className="rounded-2xl overflow-hidden w-full"
+                          >
+                            {selectedItem.url && (
+                              <img
+                                src={selectedItem.url}
+                                className="w-full object-cover rounded-2xl"
+                                alt={selectedItem.title || "Detail view"}
+                              />
+                            )}
+                          </motion.div>
+                        )}
                       </div>
-                    )}
 
-                    
+                      {/* Title & Description */}
+                      <h2 className="text-2xl font-bold mb-3">
+                        {displayItem?.title || `Item ${selectedIndex + 1}`}
+                      </h2>
+                      <p className="text-muted-foreground leading-relaxed mb-6">
+                        {displayItem?.description || "No description available."}
+                      </p>
+
+                      {/* Tags */}
+                      {displayItem && (
+                        <div className="mb-6">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Tag className="size-4 text-muted-foreground" />
+                            <p className="text-sm font-medium text-muted-foreground">Tags</p>
+                          </div>
+                          <AnimatedTags
+                            tags={(displayItem.tags ?? []).map((tag, i) => ({
+                              id: `${tag}-${i}`,
+                              label: tag,
+                            }))}
+                            editable={true}
+                            suggestions={allTagSuggestions}
+                            onAdd={(label) => updateTweetTags(displayItem.tweetId!, [...(displayItem.tags ?? []), label])}
+                            onRemove={(id) => {
+                              const idx = parseInt(id.split("-").pop() ?? "-1", 10);
+                              const next = (displayItem.tags ?? []).filter((_, i) => i !== idx);
+                              updateTweetTags(displayItem.tweetId!, next);
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -265,7 +448,16 @@ export default function FolderDetailPage() {
                   )}
                   {...animation}
                 >
-                  {filteredData.map((item, idx) => (
+                  {(() => {
+                    // Pin newly added (this session) tweets to the top-left
+                    const newItems = sessionNewIds
+                      .map((id) => filteredData.find((d) => d.tweetId === id))
+                      .filter(Boolean) as DataItem[];
+                    const rest = filteredData.filter(
+                      (d) => !d.tweetId || !sessionNewIds.includes(d.tweetId)
+                    );
+                    return [...newItems, ...rest];
+                  })().map((item, idx) => (
                     <motion.div
                       key={`${active.value}-${idx}`}
                       layoutId={selectedIndex === idx ? undefined : `item-${active.value}-${idx}`}
@@ -278,17 +470,13 @@ export default function FolderDetailPage() {
                       transition={{ delay: idx * 0.03 }}
                       onClick={() => handleItemClick(item, idx)}
                     >
-                      {item.type === "tweet" && item.tweet ? (
-                        <TweetMock
-                          username={item.tweet.username}
-                          handle={item.tweet.handle}
-                          content={item.tweet.content}
-                          verified={item.tweet.verified}
-                          likes={item.likes}
-                          retweets={item.tweet.retweets}
-                          replies={item.tweet.replies}
-                          date={item.date}
-                          className="transition-transform duration-300 group-hover:scale-[1.02]"
+                      {item.type === "pending" ? (
+                        <XTweetCardSkeleton />
+                      ) : item.type === "tweet" && item.tweetId ? (
+                        <XTweetCard
+                          id={item.tweetId}
+                          preview
+                          className="transition-transform duration-300 group-hover:scale-[1.02] w-full"
                         />
                       ) : (
                         <>
@@ -328,7 +516,10 @@ export default function FolderDetailPage() {
               exit={{ opacity: 0, y: 20 }}
               className="fixed bottom-6 left-0 right-0 flex justify-center z-40"
             >
-              <BottomMenu />
+              <BottomMenu
+                onTweetAdded={handleTweetAdded}
+                currentFolderId={isAll ? defaultFolderId ?? undefined : folderId}
+              />
             </motion.div>
           )}
         </AnimatePresence>

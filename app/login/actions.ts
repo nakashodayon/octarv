@@ -1,7 +1,6 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 import { authenticateUser, createSession } from "@/lib/auth"
 
 export async function login(formData: FormData) {
@@ -29,5 +28,5 @@ export async function login(formData: FormData) {
     path: "/",
   })
 
-  redirect("/dashboard")
+  return { success: true }
 }

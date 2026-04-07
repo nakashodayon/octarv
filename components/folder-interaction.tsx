@@ -1,13 +1,16 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface FolderInteractionProps {
   title?: string;
+  titleSlot?: ReactNode;
+  disableNavigation?: boolean;
+  folderId?: string;
 }
 
-function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
+function FolderInteraction({ title = "Folder", titleSlot, disableNavigation, folderId }: FolderInteractionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -19,9 +22,11 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
     <div className="flex flex-col items-center gap-2">
       <div
         onClick={() => {
+          if (disableNavigation) return;
           setIsOpen(true);
           setTimeout(() => {
-            router.push(`/dashboard/${title.toLowerCase()}`);
+            const slug = folderId ?? title.toLowerCase();
+            router.push(`/dashboard/${slug}`);
           }, 300);
         }}
         className="w-40 h-28 relative cursor-pointer"
@@ -147,7 +152,7 @@ function FolderInteraction({ title = "Folder" }: FolderInteractionProps) {
           </svg>
         </motion.div>
       </div>
-      <span className="text-sm text-muted-foreground">{title}</span>
+      {titleSlot ?? <span className="text-sm text-muted-foreground">{title}</span>}
     </div>
   );
 }

@@ -17,6 +17,7 @@ export interface AnimatedTagsProps {
   editable?: boolean;
   className?: string;
   tagClassName?: string;
+  suggestions?: string[];
 }
 
 export function AnimatedTags({
@@ -26,14 +27,27 @@ export function AnimatedTags({
   editable = false,
   className,
   tagClassName,
+  suggestions = [],
 }: AnimatedTagsProps) {
   const shouldReduceMotion = useReducedMotion();
   const [isAdding, setIsAdding] = useState(false);
   const [newTagValue, setNewTagValue] = useState("");
 
-  const handleAddTag = () => {
-    if (newTagValue.trim() && onAdd) {
-      onAdd(newTagValue.trim());
+  // Filter suggestions: match query and exclude already-applied tags
+  const existingLabels = new Set(tags.map((t) => t.label.toLowerCase()));
+  const filteredSuggestions = suggestions
+    .filter((s) => !existingLabels.has(s.toLowerCase()))
+    .filter((s) =>
+      newTagValue.trim()
+        ? s.toLowerCase().includes(newTagValue.trim().toLowerCase())
+        : true
+    )
+    .slice(0, 8);
+
+  const commitTag = (label: string) => {
+    const value = label.trim();
+    if (value && onAdd) {
+      onAdd(value);
       setNewTagValue("");
       setIsAdding(false);
     }
@@ -42,7 +56,7 @@ export function AnimatedTags({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      handleAddTag();
+      commitTag(newTagValue);
     } else if (e.key === "Escape") {
       setIsAdding(false);
       setNewTagValue("");
@@ -102,63 +116,53 @@ export function AnimatedTags({
           </motion.div>
         ))}
 
-        {/* Add Tag Button / Input */}
+        {/* Add Tag Button / Input — no animation, instant swap */}
         {editable && onAdd && (
-          <motion.div
-            layout
-            key="add-tag"
-            variants={tagVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 30,
-              mass: 1,
-            }}
-          >
-            <AnimatePresence mode="wait">
-              {isAdding ? (
-                <motion.div
-                  key="input"
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: "auto" }}
-                  exit={{ opacity: 0, width: 0 }}
-                  className="flex items-center"
-                >
-                  <input
-                    type="text"
-                    value={newTagValue}
-                    onChange={(e) => setNewTagValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => {
-                      if (!newTagValue.trim()) {
-                        setIsAdding(false);
-                      }
-                    }}
-                    placeholder="Add tag..."
-                    className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full outline-none focus:ring-2 focus:ring-primary/30 min-w-[100px]"
-                    autoFocus
-                  />
-                </motion.div>
-              ) : (
-                <motion.button
-                  key="button"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setIsAdding(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-muted/50 text-muted-foreground text-sm font-medium rounded-full hover:bg-muted hover:text-foreground transition-colors border-2 border-dashed border-muted-foreground/30"
-                >
-                  <Plus className="size-4" />
-                  <span>Add Tag</span>
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          <div key="add-tag">
+            {isAdding ? (
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  value={newTagValue}
+                  onChange={(e) => setNewTagValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onBlur={() => {
+                    // Delay to allow click on suggestion
+                    setTimeout(() => {
+                      if (!newTagValue.trim()) setIsAdding(false);
+                    }, 150);
+                  }}
+                  placeholder="Add tag..."
+                  className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full outline-none focus:ring-2 focus:ring-primary/30 min-w-[140px]"
+                  autoFocus
+                />
+                {filteredSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 mt-2 z-50 bg-popover border border-border rounded-xl shadow-xl p-1 min-w-[160px] max-h-64 overflow-y-auto">
+                    {filteredSuggestions.map((s) => (
+                      <button
+                        key={s}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          commitTag(s);
+                        }}
+                        className="block w-full text-left px-3 py-1.5 text-sm rounded-lg hover:bg-muted transition-colors"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsAdding(true)}
+                className="flex items-center gap-1.5 px-4 py-2 bg-muted/50 text-muted-foreground text-sm font-medium rounded-full hover:bg-muted hover:text-foreground transition-colors border-2 border-dashed border-muted-foreground/30"
+              >
+                <Plus className="size-4" />
+                <span>Add Tag</span>
+              </button>
+            )}
+          </div>
         )}
       </AnimatePresence>
     </div>
