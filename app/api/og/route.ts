@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!res.ok) {
-      return NextResponse.json({ error: "Fetch failed" }, { status: res.status });
+      return NextResponse.json(
+        { error: "Fetch failed" },
+        { status: res.status, headers: { "Cache-Control": "public, s-maxage=3600" } }
+      );
     }
 
     const html = await res.text();
