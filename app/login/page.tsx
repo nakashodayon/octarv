@@ -33,7 +33,10 @@ export default function LoginPage() {
     }
 
     setVariant("success")
-    setTimeout(() => router.push("/dashboard"), 1200)
+    setTimeout(() => {
+      router.refresh()
+      router.push("/dashboard")
+    }, 1200)
   }
 
   return (

@@ -1,7 +1,6 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 import { createUser, createSession } from "@/lib/auth"
 
 export async function signup(formData: FormData) {
@@ -30,11 +29,12 @@ export async function signup(formData: FormData) {
       path: "/",
     })
 
-    redirect("/dashboard")
+    return { success: true }
   } catch (error) {
     if (error instanceof Error && error.message === "User already exists") {
       return { error: "User already exists" }
     }
-    throw error
+    console.error("[signup] failed:", error)
+    return { error: error instanceof Error ? error.message : "Signup failed" }
   }
 }
