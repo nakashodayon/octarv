@@ -266,18 +266,26 @@ function QuotedTweet({ tweet }: { tweet: TweetData }) {
 
 export function XTweetCard({
   id,
+  data,
   className,
   preview = false,
 }: {
   id: string;
+  data?: TweetData | null;
   className?: string;
   preview?: boolean;
 }) {
-  const [tweet, setTweet] = useState<TweetData | null>(null);
+  const [tweet, setTweet] = useState<TweetData | null>(data ?? null);
   const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!data);
 
   useEffect(() => {
+    if (data) {
+      setTweet(data);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(false);
     setTweet(null);
@@ -290,7 +298,7 @@ export function XTweetCard({
       .then(setTweet)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, data]);
 
   if (loading) return <XTweetSkeleton />;
 
@@ -407,7 +415,9 @@ export function XTweetCard({
         });
         if (!firstArticle?.expanded_url) return null;
         // Skip if the link points to another tweet (already shown as quoted)
-        if (/x\.com\/\w+\/status\/\d+/.test(firstArticle.expanded_url)) return null;
+        if (/(?:x\.com|twitter\.com)\/\w+\/status\/\d+/.test(firstArticle.expanded_url)) return null;
+        // Skip X article/internal pages (login-walled, OG fetch always fails)
+        if (/(?:x\.com|twitter\.com)\/i\//.test(firstArticle.expanded_url)) return null;
         return <LinkPreview url={firstArticle.expanded_url} />;
       })()}
 

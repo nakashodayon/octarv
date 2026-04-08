@@ -29,6 +29,7 @@ interface DataItem {
   likes?: number;
   type?: "image" | "tweet" | "pending";
   tweetId?: string;
+  tweetData?: any;
 }
 
 const DATA: Record<string, DataItem[]> = {
@@ -86,11 +87,21 @@ export default function FolderDetailPage() {
     fetch(url)
       .then((r) => r.ok ? r.json() : [])
       .then((rows: Array<{ tweet_id: string; tweet_data: any; tags: string[]; ai_title: string | null; ai_description: string | null; created_at: string }>) => {
-        setSavedTweets(rows.map((row) => ({
+        // Deduplicate by the normalized ID inside tweet_data (handles legacy
+        // rows where tweet_id is the repost ID but tweet_data.id is the original).
+        const seen = new Set<string>();
+        const deduped = rows.filter((row) => {
+          const key = row.tweet_data?.id ?? row.tweet_id;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setSavedTweets(deduped.map((row) => ({
           url: "",
           height: 280,
           type: "tweet" as const,
           tweetId: row.tweet_id,
+          tweetData: row.tweet_data,
           title: row.ai_title ?? row.tweet_data?.author?.name ?? "Tweet",
           description: row.ai_description ?? row.tweet_data?.text?.slice(0, 120),
           category: "notes",
@@ -126,19 +137,23 @@ export default function FolderDetailPage() {
     })
       .then((r) => r.ok ? r.json() : Promise.reject(new Error("fetch failed")))
       .then((data) => {
+        // The server normalizes repost IDs to the original tweet ID.
+        // Use the normalized ID so subsequent operations (tags, updates) match the DB row.
+        const normalizedId: string = data.id ?? tweetId;
         setSavedTweets((prev) =>
           prev.map((t) =>
             t.tweetId === tweetId
-              ? { ...t, type: "tweet" as const, title: data.author?.name ?? "Tweet", description: data.text?.slice(0, 120) }
+              ? { ...t, type: "tweet" as const, tweetId: normalizedId, tweetData: data, title: data.author?.name ?? "Tweet", description: data.text?.slice(0, 120) }
               : t
           )
         );
+        setSessionNewIds((prev) => prev.map((id) => id === tweetId ? normalizedId : id));
 
         // Phase 2: trigger tag generation directly from client (no fire-and-forget on server)
         fetch("/api/tweets/tag", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tweetId }),
+          body: JSON.stringify({ tweetId: normalizedId }),
         })
           .then(async (r) => {
             const text = await r.text();
@@ -297,11 +312,19 @@ export default function FolderDetailPage() {
                         fetch(`/api/tweets?folderId=${folderId}`)
                           .then((r) => (r.ok ? r.json() : []))
                           .then((rows: Array<{ tweet_id: string; tweet_data: any; tags: string[]; ai_title: string | null; ai_description: string | null; created_at: string }>) => {
-                            setSavedTweets(rows.map((row) => ({
+                            const seen = new Set<string>();
+                            const deduped = rows.filter((row) => {
+                              const key = row.tweet_data?.id ?? row.tweet_id;
+                              if (seen.has(key)) return false;
+                              seen.add(key);
+                              return true;
+                            });
+                            setSavedTweets(deduped.map((row) => ({
                               url: "",
                               height: 280,
                               type: "tweet" as const,
                               tweetId: row.tweet_id,
+                              tweetData: row.tweet_data,
                               title: row.ai_title ?? row.tweet_data?.author?.name ?? "Tweet",
                               description: row.ai_description ?? row.tweet_data?.text?.slice(0, 120),
                               category: "notes",
@@ -353,6 +376,7 @@ export default function FolderDetailPage() {
                           >
                             <XTweetCard
                               id={selectedItem.tweetId!}
+                              data={selectedItem.tweetData}
                               className="w-full"
                             />
                           </motion.div>
@@ -457,6 +481,7 @@ export default function FolderDetailPage() {
                       ) : item.type === "tweet" && item.tweetId ? (
                         <XTweetCard
                           id={item.tweetId}
+                          data={item.tweetData}
                           preview
                           className="transition-transform duration-300 group-hover:scale-[1.02] w-full"
                         />
