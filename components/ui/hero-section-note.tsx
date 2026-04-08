@@ -10,10 +10,9 @@ export default function HeroSection() {
         <section className="min-h-screen flex flex-col justify-center py-12 overflow-hidden">
             <div className="relative z-10 mx-auto w-full max-w-2xl px-6 lg:px-0">
                 <div className="relative text-center">
-                    <MistKitLogo className="mx-auto" />
-                    <h1 className="mx-auto mt-8 max-w-xl text-balance text-5xl font-medium">The Note App</h1>
+                    <h1 className="mx-auto mt-8 max-w-xl text-balance text-5xl font-medium">Octarv</h1>
 
-                    <p className="text-muted-foreground mx-auto mb-6 mt-4 text-balance text-xl">The Note App is a simple note app that allows you to create and manage your notes.</p>
+                    <p className="text-muted-foreground mx-auto mb-6 mt-4 text-balance text-xl">あなたのXブックマークを知識ベースに。AIエージェントが毎朝リサーチして、最新の情報をフォルダーに自動でキュレーションします。</p>
 
                     <div className="flex flex-col items-center gap-2 *:w-full sm:flex-row sm:justify-center sm:*:w-auto">
                         <Button
@@ -21,13 +20,6 @@ export default function HeroSection() {
                             variant="default">
                             <Link href="/login">
                                 <span className="text-nowrap">Get Started</span>
-                            </Link>
-                        </Button>
-                        <Button
-                            asChild
-                            variant="ghost">
-                            <Link href="#link">
-                                <span className="text-nowrap">View Demo</span>
                             </Link>
                         </Button>
                     </div>
@@ -42,7 +34,7 @@ export default function HeroSection() {
 
                     <div className="bg-background rounded-xl relative m-4 overflow-hidden border border-transparent shadow-xl shadow-black/15 ring-1 ring-black/10 sm:m-8 md:m-12">
                         <Image
-                            src="https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=2940&auto=format&fit=crop"
+                            src="/lp-pic.png"
                             alt="app screen"
                             width="2880"
                             height="1842"
