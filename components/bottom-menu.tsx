@@ -1,18 +1,11 @@
 "use client";
 
 import {
-  Notification03Icon,
-  Search01Icon,
   Sun03Icon,
   Moon02Icon,
   ComputerIcon,
   UserEdit01Icon,
   PlusSignIcon,
-  Mic01Icon,
-  Camera01Icon,
-  PencilEdit02Icon,
-  FilterHorizontalIcon,
-  AutoConversationsIcon,
   NewTwitterIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -29,27 +22,15 @@ import { Kbd } from "@/components/ui/kbd";
 
 const MAIN_NAV = [
   { icon: PlusSignIcon, name: "home" },
-  { icon: Search01Icon, name: "search" },
-  { icon: Notification03Icon, name: "notifications" },
   { icon: UserEdit01Icon, name: "profile" },
   { icon: Sun03Icon, name: "theme" },
 ];
 
 const HOME_ITEMS = [
-  { icon: PencilEdit02Icon, text: "Note" },
-  { icon: Mic01Icon, text: "Voice" },
-  { icon: Camera01Icon, text: "Screenshot" },
   { icon: NewTwitterIcon, text: "Tweet" },
 ];
 
-const SEARCH_OPTIONS = [
-  { icon: FilterHorizontalIcon, text: "Filter" },
-  { icon: AutoConversationsIcon, text: "Trending" },
-];
-
-const NOTIFICATION_TYPES = ["Messages", "System Alerts"];
-
-const PROFILE_LINKS = ["My Account", "Settings", "Subscription / Billing"];
+const PROFILE_LINKS = ["My Account"];
 
 const THEME_OPTIONS = [
   { key: "light", icon: Sun03Icon, text: "Light" },
@@ -67,7 +48,7 @@ const BottomMenu = ({ onTweetAdded, currentFolderId }: BottomMenuProps) => {
   const [elementRef] = useMeasure();
   const [hiddenRef, hiddenBounds] = useMeasure();
   const [view, setView] = useState<
-    "default" | "home" | "search" | "notifications" | "profile" | "theme"
+    "default" | "home" | "profile" | "theme"
   >("default");
   const [tweetUrl, setTweetUrl] = useState("");
   const [tweetStep, setTweetStep] = useState<"closed" | "folder" | "input">("closed");
@@ -278,60 +259,11 @@ const BottomMenu = ({ onTweetAdded, currentFolderId }: BottomMenuProps) => {
           </div>
         );
 
-      case "search":
-        return (
-          <div className="space-y-2 min-w-[270px] p-[8px] py-1">
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Search01Icon}
-                size={17}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
-              />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-9 pr-3 py-[6px] text-[14.5px] text-white bg-white/10 border border-white/10 rounded-full focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent placeholder:text-white/40"
-              />
-            </div>
-            <div className="flex gap-1.5">
-              {SEARCH_OPTIONS.map(({ icon: Icon, text }) => (
-                <button
-                  key={text}
-                  className={`${sharedHover} flex-1 flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/15`}
-                >
-                  <HugeiconsIcon
-                    icon={Icon}
-                    size={14}
-                    strokeWidth={2}
-                    className="text-white/60 group-hover:text-white transition-all duration-75"
-                  />
-                  <span className="transition-all duration-75">{text}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case "notifications":
-        return (
-          <div className="space-y-0.5 min-w-[210px] p-[6px] py-0.5">
-            {NOTIFICATION_TYPES.map((t) => (
-              <button key={t} className={sharedHover}>
-                <span className="transition-all duration-75">{t}</span>
-              </button>
-            ))}
-          </div>
-        );
-
       case "profile":
         return (
           <div className="space-y-0.5 min-w-[230px] p-[6px] py-0.5">
             {PROFILE_LINKS.map((t) => (
-              <button
-                key={t}
-                className={sharedHover}
-                onClick={t === "Settings" ? () => { setSettingsOpen(true); setView("default"); } : undefined}
-              >
+              <button key={t} className={sharedHover}>
                 <span className="transition-all duration-75">{t}</span>
               </button>
             ))}

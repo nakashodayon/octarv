@@ -143,7 +143,7 @@ export default function ProjectDetailPage() {
             className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
           >
             <ArrowLeft className="size-4" />
-            <span className="text-sm font-bold">Agents</span>
+            <span className="text-sm font-bold">Workflow</span>
           </button>
           <span className="text-white/60">/</span>
           <span className="text-sm font-bold text-white">{project?.name ?? "…"}</span>

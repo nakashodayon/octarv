@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import DynamicScrollIslandTOC, { TOC_INTERFACE } from "@/components/ui/dynamic-scroll-island-toc";
+import { ScrollIndicator } from "@/components/ui/scroll-indicator";
 import {
   AnimatePresence,
   motion,
@@ -16,13 +16,6 @@ import { AnimatedTags, TagItem } from "@/components/ui/animated-tags";
 import { XTweetCard, XTweetCardSkeleton } from "@/components/ui/x-tweet-card";
 import { FolderTagsEditor } from "@/components/folder-tags-editor";
 import { sileo, Toaster } from "sileo";
-
-const TOC_DATA: TOC_INTERFACE[] = [
-  { name: "All" },
-  { name: "Documents", value: "documents" },
-  { name: "Images", value: "images" },
-  { name: "Notes", value: "notes" },
-];
 
 interface DataItem {
   url: string;
@@ -63,7 +56,7 @@ export default function FolderDetailPage() {
   const [folderTitle, setFolderTitle] = useState<string>(isAll ? "All" : "…");
   const [folderMatchTags, setFolderMatchTags] = useState<string[]>([]);
   const [defaultFolderId, setDefaultFolderId] = useState<string | null>(null);
-  const [active, _setActive] = useState(TOC_DATA[0]);
+  const active = { name: "All", value: undefined as string | undefined };
   const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -232,12 +225,7 @@ export default function FolderDetailPage() {
     return arr.sort(() => Math.random() - 0.5);
   }, [dataWithSaved]);
 
-  function setActive(val: TOC_INTERFACE) {
-    if (!val.value) _setActive(val);
-    setTimeout(() => _setActive(val), 400);
-  }
-
-  const baseFilteredData = active.value ? dataWithSaved[active.value as keyof typeof dataWithSaved] ?? [] : all;
+  const baseFilteredData = all;
 
   // When a tweet is selected, hide it from the gallery and sort by tag overlap.
   const filteredData = useMemo(() => {
@@ -295,13 +283,7 @@ export default function FolderDetailPage() {
                   <span className="text-sm font-bold text-white">{folderTitle}</span>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2">
-                  <DynamicScrollIslandTOC
-                    data={TOC_DATA}
-                    value={active}
-                    setValue={setActive}
-                    ref={ref}
-                    lPrefix={folderId}
-                  />
+                  <ScrollIndicator containerRef={ref} />
                 </div>
                 {!isAll ? (
                   <div className="absolute right-6 top-4">

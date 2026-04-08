@@ -57,7 +57,7 @@ export default function DashboardPage() {
         <SubSelectToggle
           options={[
             { label: "Dashboard", value: "dashboard" },
-            { label: "Agents", value: "agents" },
+            { label: "Workflow", value: "agents" },
           ]}
           value="dashboard"
           onChange={(v) => {
