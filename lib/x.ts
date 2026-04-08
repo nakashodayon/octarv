@@ -56,8 +56,8 @@ function normalizeTweet(data: any, includes: Includes): any {
   );
   if (retweetRef) {
     const originalData = includes.tweets?.find((t) => t.id === retweetRef.id);
+    const retweeter = includes.users?.find((u) => u.id === data.author_id) ?? null;
     if (originalData) {
-      const retweeter = includes.users?.find((u) => u.id === data.author_id) ?? null;
       const original = normalizeTweet(originalData, includes);
       return {
         ...original,
@@ -69,6 +69,16 @@ function normalizeTweet(data: any, includes: Includes): any {
           : null,
       };
     }
+    // Original not in includes — still use the original tweet's ID so
+    // deduplication works when the original is also saved separately.
+    const fallback = normalizeTweet({ ...data, referenced_tweets: undefined }, includes);
+    return {
+      ...fallback,
+      id: retweetRef.id,
+      retweetedBy: retweeter
+        ? { name: retweeter.name, username: retweeter.username }
+        : null,
+    };
   }
 
   const author = includes.users?.find((u) => u.id === data.author_id) ?? null;

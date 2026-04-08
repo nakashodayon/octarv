@@ -57,26 +57,38 @@ export async function GET(req: NextRequest) {
     `;
     const matchTags: string[] = (folderRows[0] as any)?.match_tags ?? [];
 
+    // Deduplicate by the normalized tweet ID inside tweet_data (handles
+    // legacy rows where tweet_id is the repost ID but tweet_data->>'id' is
+    // the original tweet ID).
     rows = matchTags.length > 0
       ? await sql`
-          SELECT DISTINCT ON (tweet_id) tweet_id, tweet_data, tags, folder_id, ai_title, ai_description, created_at
-          FROM saved_tweets
-          WHERE user_id = ${session.userId}
-            AND (folder_id = ${folderId} OR tags ?| ${matchTags as any})
-          ORDER BY tweet_id, created_at DESC
+          SELECT * FROM (
+            SELECT DISTINCT ON (COALESCE(tweet_data->>'id', tweet_id))
+              tweet_id, tweet_data, tags, folder_id, ai_title, ai_description, created_at
+            FROM saved_tweets
+            WHERE user_id = ${session.userId}
+              AND (folder_id = ${folderId} OR tags ?| ${matchTags as any})
+            ORDER BY COALESCE(tweet_data->>'id', tweet_id), created_at DESC
+          ) sub ORDER BY created_at DESC
         `
       : await sql`
-          SELECT tweet_id, tweet_data, tags, folder_id, ai_title, ai_description, created_at
-          FROM saved_tweets
-          WHERE user_id = ${session.userId} AND folder_id = ${folderId}
-          ORDER BY created_at DESC
+          SELECT * FROM (
+            SELECT DISTINCT ON (COALESCE(tweet_data->>'id', tweet_id))
+              tweet_id, tweet_data, tags, folder_id, ai_title, ai_description, created_at
+            FROM saved_tweets
+            WHERE user_id = ${session.userId} AND folder_id = ${folderId}
+            ORDER BY COALESCE(tweet_data->>'id', tweet_id), created_at DESC
+          ) sub ORDER BY created_at DESC
         `;
   } else {
     rows = await sql`
-        SELECT tweet_id, tweet_data, tags, folder_id, ai_title, ai_description, created_at
-        FROM saved_tweets
-        WHERE user_id = ${session.userId}
-        ORDER BY created_at DESC
+        SELECT * FROM (
+          SELECT DISTINCT ON (COALESCE(tweet_data->>'id', tweet_id))
+            tweet_id, tweet_data, tags, folder_id, ai_title, ai_description, created_at
+          FROM saved_tweets
+          WHERE user_id = ${session.userId}
+          ORDER BY COALESCE(tweet_data->>'id', tweet_id), created_at DESC
+        ) sub ORDER BY created_at DESC
       `;
   }
 
@@ -127,9 +139,13 @@ export async function POST(req: NextRequest) {
 
   await ensureTable();
 
+  // Use the normalized ID (original tweet ID for reposts) so that
+  // saving a repost and its original tweet hit the same UNIQUE constraint.
+  const normalizedId: string = tweetData.id ?? tweetId;
+
   await sql`
     INSERT INTO saved_tweets (user_id, tweet_id, tweet_data, tags, folder_id)
-    VALUES (${session.userId}, ${tweetId}, ${JSON.stringify(tweetData)}, NULL, ${folderId})
+    VALUES (${session.userId}, ${normalizedId}, ${JSON.stringify(tweetData)}, NULL, ${folderId})
     ON CONFLICT (user_id, tweet_id, folder_id) DO UPDATE SET tweet_data = EXCLUDED.tweet_data
   `;
 
